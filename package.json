@@ -1,0 +1,12 @@
+{
+  "name": "funnelback-prototype",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --open \"/Search%20_%20NTG%20Central.html\""
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
+}

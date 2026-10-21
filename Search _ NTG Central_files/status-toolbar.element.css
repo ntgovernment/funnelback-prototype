@@ -1,0 +1,243 @@
+status-toolbar {
+    /* display: flex; */
+    align-items: center;
+    position: fixed;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    pointer-events: none;
+    z-index: 10001;
+             
+    --tab-height: 42px;
+    --background-color: #ccc;
+    --border-color: var(--background-color);
+    --tab-transform: translateY(-50%);
+    --tab-text-transform: translateY(.5em);
+    --tab-btn-padding: 15px 18px 5px 18px;
+    --toolbar-transform: translateX(75%);
+    --toolbar-opacity: 0;
+    --tab-border-color: transparent;
+    &[open] {
+        --tab-transform: translateY(0);
+        --tab-text-transform: translateY(0);
+        --toolbar-transform: translatex(0);
+        --toolbar-opacity: 1;
+        --toolbar-pointer-events: all;
+        --tab-border-color: transparent rgba(0,0,0,.05) rgba(0,0,0,.05) rgba(255,255,255,.5);
+    }
+
+    &[tooltip]::before {
+        content: attr(tooltip);
+        position: fixed;
+        z-index: 2;
+        top: 50vh;
+        margin-top: -.5rem;
+        right: var(--tab-height);
+        background: #333;
+        color: #fff;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font: 12px "Roboto", arial, sans-serif;
+        animation: status-toolbar-tooltip-animation ease-in-out 2s; 
+        opacity: 0;
+    }
+
+    &.--status-safe {
+        --background-color: #f9d4dd;
+    }
+
+    &.--status-safe:hover {
+        --background-color: #F5B7C7;
+    }
+
+    &.--status-construction {
+        --background-color: #d3e8f6;
+    }
+
+    &.--status-construction:hover {
+        --background-color: #AAD3EE;
+    }
+
+
+    &.--status-live {
+        --background-color: #e4f1a5;
+    }
+
+    &.--status-live:hover {
+        --background-color: #DAEC83;
+    }
+
+    &.--status-archive {
+        --background-color: #e6d0c3;
+    }
+
+    &.--status-archive:hover {
+        --background-color: #DBBBA9;
+    }
+
+    &.--status-default {
+        --background-color: #feffcb;
+        --border-color: #dedede;
+    }   
+
+    &.--status-default:hover {
+        --background-color: #feffb2;
+    }     
+
+    .st__tab {
+        display: flex;
+        justify-content: center;
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        transform-origin: top left;
+        transform: translateX(100%) rotate(90deg);
+        width: 100vh;
+        /* outline: solid; */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            
+            cursor: pointer;
+            font-size: 16px;
+            
+            /* margin: 0 auto; */
+            position: relative;
+            text-align: center;
+            /* transform: var(--tab-transform); */
+            transition: all 0.2s ease-in-out;
+            min-width: 170px;
+            max-width:100%;
+            height: var(--tab-height);
+            /* var(--tab-height); */
+            font-family: "Roboto", arial, sans-serif;
+            background: var(--background-color);
+            border: 1px solid;
+            border-color: var(--tab-border-color);
+            
+            pointer-events: all;
+            padding: 0 2rem 0 1rem;
+            position: relative;
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+
+            i {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 2rem;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                /* transform: var(--tab-text-transform);
+                transition: all 0.2s ease-in-out; */
+            }
+            &, span {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            span {
+                min-width: 0;
+                text-indent: 1rem;
+                top: -.1em;
+                /* transform: var(--tab-text-transform); */
+                /* transition: all 0.2s ease-in-out; */
+            }
+            em {
+                opacity: .5;
+                font-style: normal;
+            }
+            /* &:hover {
+                --tab-transform: translateY(0);
+                --tab-text-transform: translateY(0);
+            } */
+        }
+    }
+
+    .st__tools {
+        display: flex;
+        align-items: center;
+        position: absolute;
+        z-index: 0;
+        top: 0;
+        right: calc(var(--tab-height) / 2);
+        height: 100vh;
+        
+        ul {
+            transform: var(--toolbar-transform);
+            opacity: var(--toolbar-opacity);
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            pointer-events: none;
+            transition: all 0.2s ease-in-out;
+            pointer-events: var(--toolbar-pointer-events, none);
+            width: 140rem;
+            max-width: 12rem;
+            position: relative;
+        }
+    }
+
+    .st__tools ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .st__tools ul li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    .st__tools ul li:first-child {
+            background: var(--background-color);
+    }
+    .st__tools ul li:last-child {
+        border-bottom: none;
+    }
+
+    .st__tools ul li a {
+        color: #333;
+        display: block;
+        font-size: 18px;
+        padding: 8px var(--tab-height) 8px 16px;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+        font-family: "Roboto", arial, sans-serif;
+        white-space: nowrap;
+    }
+
+    .st__tools ul li a:hover {
+        background-color: #f5f5f5;
+    }
+
+
+    /* Media query to hide the st__tools on small screens */
+    @media screen and (max-width: 767px) {
+        .st__tools-container {
+            display: none !important;
+        }
+    }
+}
+
+
+@keyframes status-toolbar-tooltip-animation {
+    0% {
+        transform: translateY(5px);
+        opacity: 0;            }
+    10%, 90% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-5px);
+        opacity: 0;
+    }
+}
+
