@@ -1,4 +1,4 @@
-import { loadIndex } from './search-index.js';
+import { loadIndex, matchRecords, normalize } from './search-index.js';
 
 const form = document.getElementById('ntgc-site-search');
 const input = document.getElementById('search');
@@ -26,17 +26,15 @@ if (form && input && list && status) {
     closeSuggestions();
     list.replaceChildren();
     matches = [];
-    const query = input.value.trim().toLocaleLowerCase();
-    if (query.length < 2 || composing || document.activeElement !== input) {
+    const query = input.value.trim();
+    if (normalize(query).length < 2 || composing || document.activeElement !== input) {
       return;
     }
 
-    matches = suggestions
-      .filter((suggestion) => suggestion.label.toLocaleLowerCase().includes(query))
-      .sort((first, second) =>
-        Number(second.label.toLocaleLowerCase().startsWith(query)) -
-        Number(first.label.toLocaleLowerCase().startsWith(query)))
+    matches = matchRecords(suggestions, query)
+      .sort((first, second) => second.score - first.score || first.position - second.position)
       .slice(0, 6);
+    matches = matches.map(({ record }) => record);
 
     for (const suggestion of matches) {
       const option = document.createElement('li');

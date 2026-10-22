@@ -1,5 +1,5 @@
 export const types = ['Information', 'Policy', 'Contact', 'Online system', 'Enterprise service', 'Agency', 'News', 'Event/Training'];
-export const categories = ['Career and development', 'Change management', 'Employment types', 'Flexible work', 'Health and safety', 'Finance and procurement', 'Technology', 'Services and applications'];
+export const categories = ['Career and development', 'Change management', 'Employment types', 'Flexible work', 'Health and safety', 'Finance and procurement', 'Technology', 'Services and applications', 'General information'];
 export const popularSearches = [['My performance', 'Emergency contacts', 'myHR'], ['Apply for leave', 'Job vacancies', 'NTG Pay'], ['NTG Online Sytems', 'The latest news']];
 export const pageSize = 10;
 
@@ -33,7 +33,8 @@ export function validateIndex(data) {
         typeof record.owner !== 'string' || !record.owner.trim() ||
         (record.updated && !/^\d{4}-\d{2}-\d{2}$/.test(record.updated)) ||
         (record.updated && !Number.isFinite(Date.parse(record.updated))) ||
-        (record.updated && new Date(record.updated).toISOString().slice(0, 10) !== record.updated)) return false;
+        (record.updated && new Date(record.updated).toISOString().slice(0, 10) !== record.updated) ||
+        (record.aliases && (!Array.isArray(record.aliases) || record.aliases.some(alias => typeof alias !== 'string' || !alias.trim())))) return false;
     ids.add(record.id);
     return true;
   });
@@ -76,7 +77,7 @@ export function matchRecords(records, query) {
   return records.flatMap((record, position) => {
     const title = normalize(record.label);
     const titleWords = words(record.label);
-    const metadata = words([record.description, record.keywords || '', record.owner,
+    const metadata = words([record.description, record.keywords || '', ...(record.aliases || []), record.owner,
       record.role || '', record.location || '', record.email || '', ...record.categories].join(' '));
     const allWords = [...titleWords, ...metadata];
     if (!tokens.every((token, index) => allWords.some(word => word === token ||
@@ -128,7 +129,7 @@ function distance(first, second) {
 
 export function suggestCorrection(records, query) {
   if (matchRecords(records, query).length) return null;
-  const dictionary = [...new Set(records.flatMap(record => words(record.label)))];
+  const dictionary = [...new Set(records.flatMap(record => [...words(record.label), ...(record.aliases || []).flatMap(words)]))];
   const tokens = words(query);
   let changed = false;
   const corrected = tokens.map(token => {

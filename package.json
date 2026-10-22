@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host localhost --open \"/Search%20_%20NTG%20Central.html\"",
+    "generate:search-index": "node scripts/generate-search-index.js",
     "test": "node --test \"Search _ NTG Central_files/search-index.test.js\""
   },
   "devDependencies": {

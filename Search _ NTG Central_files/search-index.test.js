@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { normalize, initialQuery, safeUrl, validateIndex, matchRecords, searchIndex, suggestCorrection, types, categories, popularSearches, loadIndex } from './search-index.js';
+import { agencyOwnerLabels, convertResults } from '../scripts/generate-search-index.js';
 
 const fixture = [
   { id: 'leave', label: 'Apply for leave', type: 'Information', description: 'Submit an application.', categories: ['Flexible work'], owner: 'CDC', updated: '2026-01-01' },
@@ -50,30 +51,159 @@ test('conservative correction and safe destinations', () => {
   assert.equal(safeUrl('javascript:alert(1)'), null);
   assert.equal(safeUrl('https://example.org/'), 'https://example.org/');
 });
+test('aliases support matching and spelling corrections', () => {
+  const secured = { ...fixture[0], id: 'secure-sign-in', label: 'Secure sign-in setup', aliases: ['MFA', '2FA', 'multi-factor authentication', 'multifactor authentication'] };
+  assert.equal(matchRecords([secured], 'mfa')[0].record.id, 'secure-sign-in');
+  assert.equal(matchRecords([secured], '2fa')[0].record.id, 'secure-sign-in');
+  assert.equal(matchRecords([secured], 'multifactor')[0].record.id, 'secure-sign-in');
+  assert.equal(suggestCorrection([secured], 'mfaa'), 'mfa');
+});
 test('validation rejects duplicate IDs, unknown types and invalid dates', () => {
   assert.equal(validateIndex([...fixture, fixture[0],
     { ...fixture[0], id: 'bad', type: 'Unknown' },
     { ...fixture[0], id: undefined },
     { ...fixture[0], id: 'date', updated: 'wrong' },
-    { ...fixture[0], id: 'calendar', updated: '2026-02-30' }]).length, 3);
+    { ...fixture[0], id: 'calendar', updated: '2026-02-30' },
+    { ...fixture[0], id: 'alias', aliases: 'MFA' }]).length, 3);
+});
+
+test('Funnelback conversion maps source facts and marks deterministic fallbacks', () => {
+  const source = [
+    {
+      title: 'Union contacts',
+      clickUri: 'https://ntgcentral.nt.gov.au/services-and-support/union-contacts',
+      excerpt: 'Get contact details for your union representative.',
+      raw: {
+        syssource: 'managing-people-positions',
+        syscollection: 'NTGC-col',
+        assetlineage: 'NTG Central|Services and support|Union contacts',
+        sysconcepts: 'union representative ; coverage',
+        dctermsmodified: Date.UTC(2026, 8, 14)
+      }
+    },
+    {
+      title: 'Corporate Directory',
+      uri: 'https://ntgcentral.nt.gov.au/online-systems/corporate-directory',
+      excerpt: 'Provides data and authentication services for business applications.',
+      raw: { syssource: 'online-systems', syscollection: 'NTGC-col', assetlineage: 'NTG Central|Online systems|Corporate Directory' }
+    },
+    {
+      title: 'NTG Switchboard',
+      uri: 'https://ntgcentral.nt.gov.au/phones/details?id=NTGSWITCHBOARD',
+      excerpt: 'Phone 08 8999 5511 Internal Extension 95511 Email switchboard.ntg@nt.gov.au',
+      raw: { syssource: 'switchboard', syscollection: 'NTGC-col', dctermsmodified: Date.UTC(2026, 9, 7) }
+    },
+    {
+      title: 'Miscellaneous',
+      uri: 'https://ntgcentral.nt.gov.au/miscellaneous',
+      raw: {}
+    },
+    {
+      title: 'Unsafe destination',
+      uri: 'javascript:alert(1)',
+      excerpt: 'This record must not be imported.',
+      raw: {}
+    },
+    {
+      title: 'Duplicate URL',
+      uri: 'https://ntgcentral.nt.gov.au/services-and-support/union-contacts',
+      excerpt: 'This duplicate must not replace the first result.',
+      raw: {}
+    }
+  ];
+  const first = convertResults(source);
+  const second = convertResults(source);
+  assert.deepEqual(first, second);
+  assert.equal(first.report.sourceCount, 6);
+  assert.equal(first.report.mappedCount, 4);
+  assert.equal(first.report.contactCount, 2);
+  assert.equal(first.report.duplicateCount, 1);
+  assert.equal(first.report.rejectedCount, 1);
+  assert.equal(first.report.ownerFallbacks, 1);
+  assert.equal(first.records[0].type, 'Contact');
+  assert.equal(first.records[0].owner, 'Commissioner for Public Employment, Office of');
+  assert.equal(first.records[0].updated, '2026-09-14');
+  assert.equal(first.records[0].email, 'contact-demo@example.org');
+  assert.deepEqual(first.records[0].demoFields, ['email']);
+  assert.ok(first.records[0].keywords.includes('union representative'));
+  assert.deepEqual(first.records[0].breadcrumbs, ['Services and support']);
+  assert.equal(first.records[1].type, 'Online system');
+  assert.equal(first.records[1].owner, 'Corporate and Digital Development');
+  assert.equal(first.records[1].email, 'service-demo@example.org');
+  assert.ok(first.records[1].demoFields.includes('updated'));
+  assert.equal(first.records[2].type, 'Contact');
+  assert.equal(first.records[2].owner, 'Corporate and Digital Development');
+  assert.equal(first.records[2].email, 'switchboard.ntg@nt.gov.au');
+  assert.equal(first.records[2].phone, '08 8999 5511');
+  assert.equal(first.records[2].extension, '95511');
+  assert.ok(!first.records[2].demoFields?.includes('email'));
+  assert.equal(first.records[3].description, 'Information about Miscellaneous.');
+  assert.equal(first.records[3].owner, 'Chief Minister and Cabinet');
+  assert.deepEqual(first.records[3].categories, ['General information']);
+  assert.ok(first.records[3].demoFields.includes('updated'));
+  assert.ok(first.records.every(record => validateIndex([record]).length === 1));
+});
+
+test('MFA source concepts support acronym autocomplete and spelling corrections', async () => {
+  const response = JSON.parse(await readFile(new URL('../top1000.json', import.meta.url), 'utf8'));
+  const related = response.results.filter(record => ['ICT induction', 'Microsoft Office 365', 'Be alert for fake Canvas emails'].includes(record.title));
+  const records = convertResults(related).records;
+  assert.equal(records.length, 3);
+  for (const alias of ['MFA', '2FA', '2SV']) {
+    assert.ok(records.every(record => record.aliases.includes(alias)));
+    assert.equal(matchRecords(records, alias).length, 3);
+  }
+  assert.ok(matchRecords(records, 'multifactor').length > 0);
+  assert.equal(suggestCorrection(records, 'mfaa'), 'mfa');
 });
 
 async function readIndex() {
   return JSON.parse(await readFile(new URL('./search-suggestions.json', import.meta.url), 'utf8'));
 }
 
-test('synthetic index is complete, valid and supports every popular query', async () => {
+test('expanded index preserves curated records and supports every popular query', async () => {
   const records = await readIndex();
-  assert.equal(records.length, 120);
+  assert.equal(records.length, 1116);
   assert.equal(validateIndex(records).length, records.length);
   assert.equal(new Set(records.map(record => record.id)).size, records.length);
   assert.deepEqual(new Set(records.map(record => record.type)), new Set(types));
   assert.deepEqual(new Set(records.flatMap(record => record.categories)), new Set(categories));
+  const knownAgencyOwners = new Set(agencyOwnerLabels);
+  assert.ok(records.every(record => knownAgencyOwners.has(record.owner)));
+  assert.ok(records.every(record => !/department of/i.test(record.owner)));
+  assert.ok(records.slice(0, 120).every(record => !record.id.startsWith('fb-')));
+  assert.equal(records.filter(record => record.id.startsWith('fb-')).length, 996);
   assert.ok(matchRecords(records, 'Apply f').length >= 30);
   for (const query of popularSearches.flat()) assert.ok(matchRecords(records, query).length > 0, query);
-  for (const record of records.filter(record => record.type === 'Contact')) assert.ok(record.email.endsWith('@example.org'));
+  for (const record of records.filter(record => record.type === 'Contact')) {
+    assert.ok(record.email);
+    if (record.demoFields?.includes('email')) assert.ok(record.email.endsWith('@example.org'));
+  }
+  const sourceRecords = records.filter(record => record.id.startsWith('fb-'));
+  assert.equal(sourceRecords.filter(record => record.type === 'Contact').length, 3);
+  assert.equal(sourceRecords.find(record => record.label === 'NT union contacts').type, 'Contact');
+  assert.equal(sourceRecords.find(record => record.label === 'NT union contacts').owner, 'Commissioner for Public Employment, Office of');
+  assert.equal(sourceRecords.find(record => record.label === 'Mainframe password contacts').type, 'Contact');
+  const switchboard = sourceRecords.find(record => record.label === 'NTG Switchboard');
+  assert.equal(switchboard.type, 'Contact');
+  assert.equal(switchboard.email, 'switchboard.ntg@nt.gov.au');
+  assert.equal(switchboard.phone, '08 8999 5511');
+  assert.equal(switchboard.extension, '95511');
+  assert.equal(sourceRecords.find(record => record.label === 'Corporate Directory').type, 'Online system');
+  assert.equal(sourceRecords.find(record => record.label === 'Corporate Directory').owner, 'Corporate and Digital Development');
+  const mfaRecords = sourceRecords.filter(record => record.aliases?.includes('MFA'));
+  assert.deepEqual(new Set(mfaRecords.map(record => record.label)), new Set(['ICT induction', 'Microsoft Office 365', 'Be alert for fake Canvas emails']));
+  for (const alias of ['MFA', '2FA', '2SV']) assert.equal(matchRecords(mfaRecords, alias).length, 3);
+  assert.equal(suggestCorrection(mfaRecords, 'mfaa'), 'mfa');
+  assert.ok(matchRecords(sourceRecords, 'union representative').some(({ record }) => record.label === 'NT union contacts'));
+  assert.ok(matchRecords(sourceRecords, 'mainframe password').some(({ record }) => record.label === 'Mainframe password contacts'));
+  assert.equal(new Set(sourceRecords.map(record => record.url)).size, sourceRecords.length);
+  assert.ok(sourceRecords.every(record => record.url.startsWith('https:')));
+  assert.ok(records.filter(record => record.demoFields?.includes('updated')).every(record => record.updated));
   assert.equal(records[0].label, 'Apply for leave');
   assert.equal(records[23].label, 'MyForms requests and approvals');
+  assert.equal(records[0].id, 'apply-leave');
+  assert.equal(records[23].id, 'forms');
 });
 
 test('loader shares a single request and permits retry after failure', async () => {

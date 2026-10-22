@@ -76,7 +76,19 @@ Real, supplied external destinations open in a new tab. Records without a destin
 
 ### Editing The Index
 
-[Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json) contains 120 curated synthetic records shared by autocomplete and results. The original 24 IDs/labels remain first and unchanged. This data is illustrative, not authoritative policy advice or a copy of a live index.
+[Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json) contains 120 curated synthetic records followed by records imported from the saved Funnelback response in [top1000.json](top1000.json). The original curated records stay first, and the original 24 IDs/labels remain unchanged. The current snapshot contributes 996 unique source records after URL deduplication. This local data is illustrative and is not a live or authoritative search index.
+
+Regenerate the merged index after changing either the curated records or the Funnelback snapshot:
+
+```bash
+npm run generate:search-index
+```
+
+The generator reads the response's `results` array (not `totalCount`), preserves the curated records, replaces previously generated `fb-` records, and prints an audit report. It maps source titles, safe HTTPS destinations, excerpts, thesaurus/concept terms, readable asset lineage, agency owners, and valid `dctermsmodified` values. Type and category are inferred from source metadata; records without a confident category use `General information`. The existing result-type controls keep their current design and count the imported records. Directory pages listed under online systems remain systems; only clearly contact-focused source pages are classified as Contact.
+
+Content owner names follow the official [NT Government agencies directory](https://nt.gov.au/about-government/government-agencies). Department entries use the agency name without the trailing “Department of” wording. The generator maps recognized source sections and exact agency titles to those names; content shared across government or without a specific source mapping falls back to **Chief Minister and Cabinet**. Funnelback does not provide an authoritative owner field, so these assignments are inferred and should be verified before being treated as official ownership.
+
+Dates without a valid content-modified timestamp use a deterministic demo date. Generated contact and service email addresses use the reserved `example.org` domain and are labeled as demo data. Explicit contact details present in a source excerpt, such as the NTG Switchboard listing, are retained; the generator does not invent names, roles, phone numbers, or office locations. `sysdate` and `sysindexeddate` are indexing timestamps and are not used as content-update dates.
 
 ```json
 [
@@ -86,25 +98,27 @@ Real, supplied external destinations open in a new tab. Records without a destin
 		"type": "Information",
 		"description": "Find the leave application process and approval steps.",
 		"categories": ["Employment types"],
-		"owner": "CDC",
+		"owner": "Corporate and Digital Development",
 		"updated": "2026-09-14",
 		"breadcrumbs": ["My job", "Leave", "Applications"]
 	}
 ]
 ```
 
-Required fields are a unique lowercase ASCII `id` (letters, digits and hyphens), nonblank `label`, recognized `type`, `description`, nonempty recognized `categories` array and nonblank `owner`. Optional `updated` dates must be valid `YYYY-MM-DD` calendar dates. Optional fields include `keywords`, `breadcrumbs`, `url`, `role`, `location`, `email`, `phone` and `extension`. Category/type vocabularies are exported by [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js). Invalid records and duplicate IDs are skipped; an empty valid index is an error. Navigation only accepts HTTPS, mail and telephone URLs.
+Required fields are a unique lowercase ASCII `id` (letters, digits and hyphens), nonblank `label`, recognized `type`, `description`, nonempty recognized `categories` array and nonblank `owner`. Optional `updated` dates must be valid `YYYY-MM-DD` calendar dates. Optional fields include `keywords`, `aliases`, `breadcrumbs`, `url`, `role`, `location`, `email`, `phone`, `extension`, `source`, `inferredFields`, and `demoFields`. Aliases are searched by autocomplete and included in “Did you mean?” corrections. Source-backed multi-factor authentication records include `MFA`, `2FA`, `2SV`, `multifactor authentication`, `two-factor authentication`, and `two-step verification` variants. Category/type vocabularies are exported by [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js). Invalid records and duplicate IDs are skipped; an empty valid index is an error. Navigation only accepts HTTPS, mail and telephone URLs.
 
-Autocomplete and results share one cached JSON request per page load, with no per-keystroke requests or added dependencies. A failed load is evicted from the cache so search can retry. If initial autocomplete loading fails, reload after restoring the data to restore suggestions. Text, query highlighting and record details are built using DOM text APIs, not HTML interpolation. Reload after editing the JSON; keep it valid JSON without comments or trailing commas.
+Autocomplete and results share one cached JSON request per page load, with no per-keystroke network requests or added dependencies. Suggestions use the same metadata-aware matching and ranking as results, including descriptions and keywords. A failed load is evicted from the cache so search can retry. If initial autocomplete loading fails, reload after restoring the data to restore suggestions. Text, query highlighting and record details are built using DOM text APIs, not HTML interpolation. Reload after editing the JSON; keep it valid JSON without comments or trailing commas.
 
 Popular-search labels and links are authored in [Search _ NTG Central.html](Search%20_%20NTG%20Central.html), separately from the index. When changing them, update the `popularSearches` export in [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js) as well, so coverage tests check the same queries. Ensure each popular query still matches an indexed record. The tests deliberately assert 120 records and the original first/24th labels; update those expectations only when intentionally changing the dataset contract.
 
 ## Validation
 
-Run the built-in Node test suite and syntax checks from the project root:
+Regenerate and validate the built-in Node test suite and syntax checks from the project root:
 
 ```bash
+npm run generate:search-index
 npm test
+node --check scripts/generate-search-index.js
 node --check "Search _ NTG Central_files/search-index.js"
 node --check "Search _ NTG Central_files/search-results.js"
 node --check "Search _ NTG Central_files/search-autocomplete.js"
@@ -112,7 +126,7 @@ node --check "Search _ NTG Central_files/header-compact.js"
 node --check "Search _ NTG Central_files/global-v2.js"
 ```
 
-Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, safe destinations, record validation, shared loading/retry, all 120 records and every popular query. There is no lint or build script.
+Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, safe destinations, record validation, shared loading/retry, deterministic Funnelback conversion, the 120-record curated prefix, imported Contact/system classification, and every popular query. There is no lint or build script.
 
 For browser checks, use the localhost Vite URL and verify:
 

@@ -6,7 +6,6 @@ const input = document.getElementById('search');
 const status = document.getElementById('local-search-status');
 const popularTemplate = root.firstElementChild.cloneNode(true);
 const icons = ['fa-layer-group', 'fa-circle-info', 'fa-file-lines', 'fa-address-book', 'fa-laptop', 'fa-handshake', 'fa-building', 'fa-newspaper', 'fa-calendar-days'];
-const ownerNames = { CDC: 'Corporate and Digital Development' };
 const mobile = matchMedia('(max-width: 899px)');
 let records = [];
 let state = freshState('');
@@ -123,15 +122,29 @@ function renderRecord(record) {
   title.append(destination(record.label, record.url, record.id, 'local-result-title'));
   article.append(title);
   if (record.type === 'Contact') {
+    const crumbs = element('div', 'local-breadcrumbs');
+    const path = ['NTG Central', ...(record.breadcrumbs || [])];
+    path.forEach((part, index) => {
+      if (index) crumbs.append(icon('fa-chevron-right'));
+      crumbs.append(element('span', '', part));
+    });
     const contact = element('div', 'local-contact');
     const details = element('div');
-    details.append(element('p', '', record.role), element('p', '', record.location), element('p', '', ownerNames[record.owner] || record.owner));
+    if (record.role) details.append(element('p', '', record.role));
+    if (record.location) details.append(element('p', '', record.location));
+    if (!record.breadcrumbs?.some(part => normalize(part) === normalize(record.owner))) details.append(element('p', '', record.owner));
     const actions = element('div');
-    if (record.email) actions.append(destination(record.email, `mailto:${record.email}`, record.id));
+    if (record.email) {
+      const demoEmail = record.demoFields?.includes('email');
+      actions.append(destination(demoEmail ? 'Demo contact address' : 'Email contact', `mailto:${record.email}`, record.id));
+      if (demoEmail) actions.append(element('p', 'local-updated', 'Prototype placeholder only; not a staff contact.'));
+    }
     if (record.phone) actions.append(destination(record.phone, `tel:${record.phone}`, record.id));
     if (record.extension) actions.append(element('p', '', `ext. ${record.extension}`));
     contact.append(details, actions);
-    article.append(contact);
+    const snippet = element('p', 'local-snippet');
+    snippet.append(highlight(record.description));
+    article.append(crumbs, contact, snippet);
   } else {
     const crumbs = element('div', 'local-breadcrumbs');
     const path = ['NTG Central', ...(record.breadcrumbs || [record.type, record.categories[0]])];
@@ -146,13 +159,16 @@ function renderRecord(record) {
       const actions = element('div', 'local-actions');
       actions.append(destination(`${record.url ? 'Open' : 'View'} ${record.label}`, record.url, record.id));
       const email = record.email || 'service-demo@example.org';
-      actions.append(destination('Contact support', `mailto:${email}`, record.id));
+      const demoEmail = !record.email || record.demoFields?.includes('email');
+      actions.append(destination(demoEmail ? 'Demo support contact' : 'Contact support', `mailto:${email}`, record.id));
+      if (demoEmail) actions.append(element('p', 'local-updated', 'Prototype placeholder only; not an operational support channel.'));
       article.append(actions);
     }
-    if (record.updated) {
-      const date = new Date(`${record.updated}T12:00:00Z`).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
-      article.append(element('p', 'local-updated', `Last updated: ${date}`));
-    }
+  }
+  if (record.updated) {
+    const date = new Date(`${record.updated}T12:00:00Z`).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+    const label = record.demoFields?.includes('updated') ? 'Demo date' : 'Last updated';
+    article.append(element('p', 'local-updated', `${label}: ${date}`));
   }
   return article;
 }
@@ -311,11 +327,14 @@ function showRecord(id, trigger) {
   close.append(icon('fa-xmark'));
   close.addEventListener('click', () => dialog.close());
   const details = element('dl');
-  for (const [label, value] of [['Type', record.type], ['Content owner', ownerNames[record.owner] || record.owner], ['Category', record.categories.join(', ')], ['Role', record.role], ['Location', record.location]]) {
+  for (const [label, value] of [['Type', record.type], ['Content owner', record.owner], ['Category', record.categories.join(', ')], ['Role', record.role], ['Location', record.location]]) {
     if (value) details.append(element('dt', '', label), element('dd', '', value));
   }
-  dialog.replaceChildren(close, title, element('p', '', record.description), details, element('p', 'local-updated', 'Synthetic demonstration record. Not authoritative guidance.'));
-  if (record.email) dialog.append(destination(record.email, `mailto:${record.email}`, id));
+  const provenance = record.source
+    ? 'Imported source result. Agency owner, type and category labels are inferred for this prototype.'
+    : 'Synthetic demonstration record. Not authoritative guidance.';
+  dialog.replaceChildren(close, title, element('p', '', record.description), details, element('p', 'local-updated', provenance));
+  if (record.email) dialog.append(destination(record.demoFields?.includes('email') ? 'Demo contact address' : record.email, `mailto:${record.email}`, id));
   dialog.showModal();
 }
 
