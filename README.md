@@ -27,11 +27,11 @@ Only the large main search field uses the local index. Header navigation, the co
 
 ## Header
 
-The utility row contains NTG Directory, NTG Policy Library, MyHR, MyForms, Noticeboard, and Online systems. MyForms points to `https://myforms.nt.gov.au/`; Online systems links to `https://ntgcentral.nt.gov.au/online-systems`.
+The desktop utility row contains NTG Directory, NTG Policy Library, MyHR, MyForms, Noticeboard, and Online systems. At mobile widths (768px and below), that row is hidden and its links appear under the first hamburger-menu item, Quick links, above My job. MyForms points to `https://myforms.nt.gov.au/`; Online systems links to `https://ntgcentral.nt.gov.au/online-systems`.
 
-The main menu starts with My job; the Home item has been removed. Its final Online systems item opens `https://nt.gov.au/` in a new tab. This is separate from the utility-row Online systems link.
+The desktop main menu starts with My job; the Home item has been removed. Its final Online systems item opens `https://nt.gov.au/` in a new tab. This is separate from the utility-row Online systems link.
 
-The main header spans the viewport without a maximum-width cap, with 32px desktop edge padding and 16px mobile edge padding. Its 72px navy band (`#102040`) contains a white logo and bold Roboto navigation, a 294px by 40px white search pill, and a 40px green (`#208820`) avatar showing the current user's initial. Desktop profile controls show the avatar only; profile data and navigation destinations are unchanged.
+The main header bands span the viewport while the Quick links and main-header contents are centered and capped at 1232px. A 1px `#384560` divider sits below the desktop Quick links row. The header uses 32px desktop edge padding and 16px mobile edge padding. Its 72px navy band (`#102040`) contains a white logo and bold Roboto navigation, a 294px by 40px white search pill, and a 40px green (`#208820`) avatar showing the current user's initial. Desktop profile controls show the avatar only; profile data and navigation destinations are unchanged.
 
 Font Awesome is loaded from kit `https://kit.fontawesome.com/41b791824a.js` with `crossorigin="anonymous"`, replacing the local icon stylesheet. The kit provides compatibility styles for the snapshot's legacy `fas`/`fal` classes and CSS pseudo-element icons. It requires network access and `localhost` authorization. A 403 response from the kit prevents icons from rendering; check kit availability and allowed domains in Font Awesome. No additional npm dependency is needed.
 
@@ -39,7 +39,7 @@ At viewport widths of 1296px and above, the existing main menu is placed beside 
 
 ## Search Autocomplete
 
-The NTG Central breadcrumb above Search has been removed; the logo and navigation branding remain. The main search form now sits inside the header beneath the white Roboto bold Search heading (48px font size and line height). A 32px gap separates the title from the white search field, which is 56px high and at most 812px wide, shrinking to fit smaller screens. The input uses 16px text, 24px line height, 16px left padding, and a right-aligned search button. The compact navigation search is unchanged and does not use autocomplete.
+The NTG Central breadcrumb above Search has been removed; the logo and navigation branding remain. The main search form now sits inside the header beneath the white Roboto bold Search heading (48px font size and line height), with a 32px gap between the main navigation band and the heading. A 32px gap separates the title from the white search field, which is 56px high and at most 812px wide, shrinking to fit smaller screens. The input uses 16px text, 24px line height, 16px left padding, and a right-aligned search button. The compact navigation search is unchanged and does not use autocomplete.
 
 Suggestions appear when the focused field contains at least two characters after trimming leading and trailing whitespace. Matching is case-insensitive and includes substrings, with prefix matches first and original dataset order retained within each group. Up to six matches are shown. Clearing the field, dropping below the threshold, or entering a query with no matches hides the dropdown.
 
