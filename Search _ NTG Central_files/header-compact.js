@@ -62,8 +62,72 @@
       });
   }
 
+  function initResponsiveSearch() {
+    var header = document.querySelector(".ntgc-header__inner--main");
+    var search = header && header.querySelector(".ntgc-header__search");
+    var form = search && search.querySelector("form");
+    var input = form && form.querySelector("input");
+    var submit = form && form.querySelector(".ntgc-search__submit");
+    if (!header || !search || !form || !input || !submit) {
+      return;
+    }
+
+    var compactLayout = window.matchMedia("(max-width: 1295px)");
+
+    function setExpanded(isExpanded, returnFocus) {
+      if (!compactLayout.matches) {
+        return;
+      }
+
+      search.classList.toggle("is-open", isExpanded);
+      submit.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+      if (isExpanded) {
+        input.focus();
+      } else if (returnFocus) {
+        submit.focus();
+      }
+    }
+
+    function updateLayout() {
+      if (compactLayout.matches) {
+        submit.setAttribute(
+          "aria-expanded",
+          search.classList.contains("is-open") ? "true" : "false",
+        );
+      } else {
+        search.classList.remove("is-open");
+        submit.removeAttribute("aria-expanded");
+      }
+    }
+
+    header.classList.add("has-responsive-search");
+    updateLayout();
+
+    form.addEventListener("submit", function (event) {
+      if (compactLayout.matches && !search.classList.contains("is-open")) {
+        event.preventDefault();
+        setExpanded(true, false);
+      }
+    });
+
+    document.addEventListener("click", function (event) {
+      if (compactLayout.matches && !search.contains(event.target)) {
+        setExpanded(false, false);
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && search.classList.contains("is-open")) {
+        setExpanded(false, true);
+      }
+    });
+
+    window.addEventListener("resize", updateLayout);
+  }
+
   function initUtilityNavigation() {
     placeMainMenu();
+    initResponsiveSearch();
     var utilityNav = document.querySelector(".ntgc-navigation--utility");
     if (!utilityNav) {
       return;

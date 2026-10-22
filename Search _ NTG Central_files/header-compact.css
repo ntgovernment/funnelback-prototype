@@ -459,6 +459,57 @@
   transition: transform 150ms ease;
 }
 
+@media (max-width: 1295px) {
+  .ntgc-header__inner--main.has-responsive-search > .row > .ntgc-header__search {
+    flex: 0 0 40px;
+    max-width: 40px;
+    transition:
+      flex-basis 180ms ease,
+      width 180ms ease;
+    width: 40px;
+    z-index: 2;
+  }
+
+  .ntgc-header__inner--main.has-responsive-search > .row > .ntgc-header__search.is-open {
+    flex-basis: min(294px, calc(100vw - 160px));
+    max-width: min(294px, calc(100vw - 160px));
+    width: min(294px, calc(100vw - 160px));
+  }
+
+  .ntgc-header__inner--main.has-responsive-search .ntgc-header__search .ntgc-search__text-input {
+    background: transparent;
+    opacity: 0;
+    padding-left: 0;
+    padding-right: 40px;
+    transition: opacity 120ms ease;
+    visibility: hidden;
+  }
+
+  .ntgc-header__inner--main.has-responsive-search .ntgc-header__search .ntgc-search__submit {
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    right: 0;
+    width: 40px;
+  }
+
+  .ntgc-header__inner--main.has-responsive-search .ntgc-header__search .ntgc-search__submit .fa-search {
+    color: inherit;
+  }
+
+  .ntgc-header__inner--main.has-responsive-search .ntgc-header__search.is-open .ntgc-search__text-input {
+    background: #fff;
+    opacity: 1;
+    padding-left: 16px;
+    padding-right: 52px;
+    visibility: visible;
+  }
+
+  .ntgc-header__inner--main.has-responsive-search .ntgc-header__search.is-open .ntgc-search__submit {
+    color: #102040;
+  }
+}
+
 @media (max-width: 768px) {
   .ntgc-header__inner--utility {
     display: none;
@@ -500,6 +551,26 @@
   .ntgc-header__inner--main .ntgc-header__search,
   .ntgc-header__inner--main .ntgc-header__avatar {
     display: none;
+  }
+
+  .ntgc-header__inner--main.has-responsive-search .ntgc-header__search-mobile {
+    display: none;
+  }
+
+  .ntgc-header__inner--main.has-responsive-search > .row > .ntgc-header__search {
+    display: block;
+    flex: 0 0 40px;
+    max-width: 40px;
+    position: absolute;
+    right: 64px;
+    top: 16px;
+    width: 40px;
+  }
+
+  .ntgc-header__inner--main.has-responsive-search > .row > .ntgc-header__search.is-open {
+    flex-basis: min(294px, calc(100vw - 96px));
+    max-width: min(294px, calc(100vw - 96px));
+    width: min(294px, calc(100vw - 96px));
   }
 
   .ntgc-header .ntgc-header__inner--main .toggle-mobile-nav {
