@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       review_reference:
-        description: 'Approval reference for this commit: content, assets, repository exposure'
+        description: "Approval reference for this commit: content, assets, repository exposure"
         required: true
         type: string
       publish:
-        description: 'I approve this reviewed commit for unrestricted public access'
+        description: "I approve this reviewed commit for unrestricted public access"
         required: true
         default: false
         type: boolean
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
       - run: npm ci
       - run: npm test

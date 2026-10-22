@@ -6,7 +6,7 @@ Interactive NTG Central search prototype with a shared 1,116-record index: 120 c
 
 Tester URL: https://ntgovernment.github.io/funnelback-prototype/
 
-Source and documentation belong on `main`. The `gh-pages` branch contains only the generated site, including its root `index.html`, original named entry, local assets and `.nojekyll`. Initial publication commit: `03d3a2f`. GitHub Pages is configured to deploy from `gh-pages`, folder `/`. The latest HTTP check returned 404; confirm a successful Pages deployment before distributing this URL to participants.
+Source and documentation belong on `main`. The `gh-pages` branch contains only the generated site, including its root `index.html`, original named entry, local assets and `.nojekyll`. Initial publication commit: `03d3a2f`. GitHub Pages is configured to deploy from `gh-pages`, folder `/`. Initial verification returned 404 while deployment was queued; confirm a successful Pages deployment before distributing this URL to participants. A source commit does not republish the artifact.
 
 Build and validate a release from the source checkout:
 
@@ -32,20 +32,40 @@ npm run preview:public
 
 Open http://127.0.0.1:4175/funnelback-prototype/. For automated browser checks, install Chromium with `npx playwright install chromium`, then run `npm run test:browser`; Playwright starts or reuses this preview server. The kit must allow the preview hostname for those checks. After publishing, verify the root URL, `?searchterm=Apply%20for%20leave`, refresh, JSON/module responses, icons, keyboard interaction and mobile filters without an NTG login. A 404 requires checking the repository's Pages settings and deployment run; a pushed branch alone does not prove the site is available.
 
+If the terminal uses an HTTP proxy, exclude loopback hosts when running Playwright. Otherwise its server readiness check can miss a running preview and report a timeout or `EADDRINUSE`. In Bash:
+
+```bash
+NO_PROXY=127.0.0.1,localhost no_proxy=127.0.0.1,localhost npm run test:browser
+```
+
+If a Pages deploy job is queued with no runner assigned, first check [GitHub Status](https://www.githubstatus.com/), pending approvals and the environment's permitted deployment branches. A hosted-runner service incident cannot be fixed by changing the site's assets. The Node deprecation and Ubuntu migration notices alone do not indicate a failed deployment.
+
 ## Workshop Testing
 
 Participants open the tester URL in a separate tab and return to the Optimal Workshop study to report completion and feedback. Confirm the URL is live and pilot on desktop and mobile before inviting testers. No Optimal Workshop SDK, recording, analytics or automatic task-success tracking is included.
 
-| Task | Observable success |
-| --- | --- |
-| Find guidance for applying for leave using search suggestions. | Select a relevant suggestion, submit and identify a relevant result. |
-| Narrow an `apply` search by result type, category and owner, then reset. | Results and counts change; clearing filters retains the query. |
-| Recover from `leavve`. | Use the offered `leave` correction and identify a relevant result. |
-| Find the Switchboard contact. | Identify the contact result; its address is demo data, not an operational contact. |
-| On mobile, change sort in Filter and sort, cancel, then apply it. | Cancel preserves the previous sort; Show results applies the draft. |
-| Inspect a demonstration record with no external destination. | Open its local detail dialog, close with Escape and recover focus. |
+| Task                                                                     | Observable success                                                                 |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Find guidance for applying for leave using search suggestions.           | Select a relevant suggestion, submit and identify a relevant result.               |
+| Narrow an `apply` search by result type, category and owner, then reset. | Results and counts change; clearing filters retains the query.                     |
+| Recover from `leavve`.                                                   | Use the offered `leave` correction and identify a relevant result.                 |
+| Find the Switchboard contact.                                            | Identify the contact result; its address is demo data, not an operational contact. |
+| On mobile, change sort in Filter and sort, cancel, then apply it.        | Cancel preserves the previous sort; Show results applies the draft.                |
+| Inspect a demonstration record with no external destination.             | Open its local detail dialog, close with Escape and recover focus.                 |
 
 Record completion, confidence and comments in the study. Do not ask participants to email or call demonstration contacts. Live links can leave the prototype; decide in advance whether following them is part of a task. In-place searches and filters do not update the URL, so URL observation alone cannot establish task success. Start each task from the root URL or an explicit `searchterm` link.
+
+## Logos
+
+Both the header and footer use the supplied [white 86x32 SVG](Search%20_%20NTG%20Central_files/ntg-central-logo.svg), with an accessible `NTG Central` image label and fixed intrinsic dimensions. Its mark and lettering are vector paths, not font-dependent SVG text. Do not replace the lettering with a font or add Adobe/Typekit requests.
+
+The build converts legacy inline logos to this shared asset and copies its bytes unchanged into `dist/`. Public checks require both logo references and compare the published SVG with the source asset. The focused browser check verifies that both images load at their supplied dimensions:
+
+```bash
+npm run test:browser -- --grep "both NTG logos"
+```
+
+Logo rendering has also been checked at 390px and 1440px in local and production previews, including nonblank white-pixel checks. These local checks do not establish that the latest artifact has been published.
 
 ## GitHub Pages Icons
 
@@ -62,7 +82,7 @@ npm install
 npm run dev
 ```
 
-Vite opens [Search _ NTG Central.html](Search%20_%20NTG%20Central.html) at `http://localhost:5173/`. If that port is occupied, use the next available port printed by Vite, such as `http://localhost:5174/`. Serve the page through Vite rather than opening it directly from disk: autocomplete uses a JavaScript module and fetches a local JSON file.
+Vite opens [Search \_ NTG Central.html](Search%20_%20NTG%20Central.html) at `http://localhost:5173/`. If that port is occupied, use the next available port printed by Vite, such as `http://localhost:5174/`. Serve the page through Vite rather than opening it directly from disk: autocomplete uses a JavaScript module and fetches a local JSON file.
 
 Use `localhost` for the development URL. A 403 from the kit or its font requests requires checking the kit's allowed domains and license; the public and preview hosts require their own authorization.
 
@@ -131,7 +151,7 @@ Real, supplied external destinations open in a new tab. Records without a destin
 
 ### Editing The Index
 
-[Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json) contains 120 curated records followed by 996 sanitized imported records. The original curated records stay first, and the original 24 IDs/labels remain unchanged. The private Funnelback snapshot, `top1000.json`, is ignored and is not required to run, test or build a clean checkout. This local data is illustrative and is not a live or authoritative search index.
+[Search \_ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json) contains 120 curated records followed by 996 sanitized imported records. The original curated records stay first, and the original 24 IDs/labels remain unchanged. The private Funnelback snapshot, `top1000.json`, is ignored and is not required to run, test or build a clean checkout. This local data is illustrative and is not a live or authoritative search index.
 
 Only maintainers with an approved private snapshot should regenerate the merged index. Regeneration can reintroduce real source contact details; sanitize the tracked files immediately afterwards, review the changes and rerun validation before committing:
 
@@ -148,24 +168,24 @@ Dates without a valid content-modified timestamp use a deterministic demo date. 
 
 ```json
 [
-	{
-		"id": "apply-leave",
-		"label": "Apply for leave",
-		"type": "Information",
-		"description": "Find the leave application process and approval steps.",
-		"categories": ["Employment types"],
-		"owner": "Corporate and Digital Development",
-		"updated": "2026-09-14",
-		"breadcrumbs": ["My job", "Leave", "Applications"]
-	}
+  {
+    "id": "apply-leave",
+    "label": "Apply for leave",
+    "type": "Information",
+    "description": "Find the leave application process and approval steps.",
+    "categories": ["Employment types"],
+    "owner": "Corporate and Digital Development",
+    "updated": "2026-09-14",
+    "breadcrumbs": ["My job", "Leave", "Applications"]
+  }
 ]
 ```
 
-Required fields are a unique lowercase ASCII `id` (letters, digits and hyphens), nonblank `label`, recognized `type`, `description`, nonempty recognized `categories` array and nonblank `owner`. Optional `updated` dates must be valid `YYYY-MM-DD` calendar dates. Optional fields include `keywords`, `aliases`, `breadcrumbs`, `url`, `role`, `location`, `email`, `phone`, `extension`, `source`, `inferredFields`, and `demoFields`. Aliases are searched by autocomplete and, together with labels and keywords, can contribute to result-page “Did you mean?” suggestions. Source-backed multi-factor authentication records include `MFA`, `2FA`, `2SV`, `multifactor authentication`, `two-factor authentication`, and `two-step verification` variants. Category/type vocabularies are exported by [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js). Invalid records and duplicate IDs are skipped; an empty valid index is an error. Navigation only accepts HTTPS, mail and telephone URLs.
+Required fields are a unique lowercase ASCII `id` (letters, digits and hyphens), nonblank `label`, recognized `type`, `description`, nonempty recognized `categories` array and nonblank `owner`. Optional `updated` dates must be valid `YYYY-MM-DD` calendar dates. Optional fields include `keywords`, `aliases`, `breadcrumbs`, `url`, `role`, `location`, `email`, `phone`, `extension`, `source`, `inferredFields`, and `demoFields`. Aliases are searched by autocomplete and, together with labels and keywords, can contribute to result-page “Did you mean?” suggestions. Source-backed multi-factor authentication records include `MFA`, `2FA`, `2SV`, `multifactor authentication`, `two-factor authentication`, and `two-step verification` variants. Category/type vocabularies are exported by [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js). Invalid records and duplicate IDs are skipped; an empty valid index is an error. Navigation only accepts HTTPS, mail and telephone URLs.
 
 Autocomplete and results share one cached JSON request per page load, with no per-keystroke network requests or added dependencies. Suggestions use the same metadata-aware matching and ranking as results, including descriptions and keywords. A failed load is evicted from the cache so search can retry. If initial autocomplete loading fails, reload after restoring the data to restore suggestions. Text, query highlighting and record details are built using DOM text APIs, not HTML interpolation. Reload after editing the JSON; keep it valid JSON without comments or trailing commas.
 
-Popular-search labels and links are authored in [Search _ NTG Central.html](Search%20_%20NTG%20Central.html), separately from the index. When changing them, update the `popularSearches` export in [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js) as well, so coverage tests check the same queries. Ensure each popular query still matches an indexed record. Tests assert 1,116 total records, a 120-record curated prefix and the original first/24th labels; update those expectations only when intentionally changing the dataset contract.
+Popular-search labels and links are authored in [Search \_ NTG Central.html](Search%20_%20NTG%20Central.html), separately from the index. When changing them, update the `popularSearches` export in [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js) as well, so coverage tests check the same queries. Ensure each popular query still matches an indexed record. Tests assert 1,116 total records, a 120-record curated prefix and the original first/24th labels; update those expectations only when intentionally changing the dataset contract.
 
 ## Validation
 
@@ -184,7 +204,7 @@ node --check "Search _ NTG Central_files/header-compact.js"
 node --check "Search _ NTG Central_files/global-v2.js"
 ```
 
-Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, related suggestions and closest-match fallback, safe destinations, record validation, shared loading/retry, deterministic conversion using synthetic fixtures, the curated prefix, imported classification and every popular query. Public-build tests additionally cover sanitization, the shared Pro kit and SVG preservation. There is no lint script. Playwright covers entry points, deep links, keyboard autocomplete, dialogs, mobile drafts, layouts and icons; kit access is required.
+Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, related suggestions and closest-match fallback, safe destinations, record validation, shared loading/retry, deterministic conversion using synthetic fixtures, the curated prefix, imported classification and every popular query. Public-build tests additionally cover sanitization, the shared Pro kit, numeric SVG geometry and conversion of both logos to the supplied asset. Artifact checks verify the SVG byte-for-byte. There is no lint script. Playwright covers entry points, deep links, keyboard autocomplete, dialogs, mobile drafts, layouts, shared logos and icons; icon checks require kit access.
 
 For browser checks, use the localhost Vite URL and verify:
 
@@ -200,17 +220,17 @@ For browser checks, use the localhost Vite URL and verify:
 
 ### Troubleshooting
 
-| Symptom | Check |
-| --- | --- |
-| Search is temporarily unavailable | Check the local JSON request for an HTTP error, invalid JSON or an index with no valid records. Restore the data, then select Try again. |
-| Results load after retry but suggestions remain absent | Reload the page. Autocomplete initializes its own suggestions once, even though the loader cache is shared. |
-| A result disappears after editing the index | Check required fields, duplicate IDs, exact type/category names and calendar dates. Run `npm test` to validate the shipped dataset. |
-| Icons are missing | Use `localhost`, confirm network access and check the Font Awesome kit request for a 403 response. |
-| Refresh restores a previous search | The current address, not in-memory search/filter state, determines initialization. Update `searchterm` explicitly to change the reload query. |
+| Symptom                                                | Check                                                                                                                                         |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Search is temporarily unavailable                      | Check the local JSON request for an HTTP error, invalid JSON or an index with no valid records. Restore the data, then select Try again.      |
+| Results load after retry but suggestions remain absent | Reload the page. Autocomplete initializes its own suggestions once, even though the loader cache is shared.                                   |
+| A result disappears after editing the index            | Check required fields, duplicate IDs, exact type/category names and calendar dates. Run `npm test` to validate the shipped dataset.           |
+| Icons are missing                                      | Use `localhost`, confirm network access and check the Font Awesome kit request for a 403 response.                                            |
+| Refresh restores a previous search                     | The current address, not in-memory search/filter state, determines initialization. Update `searchterm` explicitly to change the reload query. |
 
 ### Known Limitations
 
-The public page uses local Roboto files and a remote Font Awesome Pro kit. Icons need network access and an authorized hostname. The build excludes snapshot analytics, profile integrations and legacy scripts; those unused legacy files may still exist in the source tree. Approved navigation links can lead to live NTG destinations outside the prototype.
+The header and footer share the supplied white 86x32 SVG in [Search \_ NTG Central_files/ntg-central-logo.svg](Search%20_%20NTG%20Central_files/ntg-central-logo.svg). Its lettering is outlined, so the logos do not depend on installed fonts, Adobe Fonts or external requests. The build copies this asset unchanged and checks both logo references. Page text uses local Roboto files. The remote Font Awesome Pro kit still requires network access and an authorized hostname. The build excludes snapshot analytics, profile integrations and legacy scripts; those unused legacy files may still exist in the source tree. Approved navigation links can lead to live NTG destinations outside the prototype.
 
 The local search UI requires JavaScript. Both forms have local native actions, but results and suggestions require the controller to initialize. Popular searches markup is static, but running those queries requires JavaScript.
 
@@ -218,18 +238,19 @@ This is an in-browser demonstration, not a production Funnelback integration: th
 
 ## Source Files
 
-- [Search _ NTG Central.html](Search%20_%20NTG%20Central.html): page, header search form, and accessible autocomplete markup
-- [Search _ NTG Central_files/header-compact.css](Search%20_%20NTG%20Central_files/header-compact.css): compact header, main search field, and suggestions styling
-- [Search _ NTG Central_files/header-compact.js](Search%20_%20NTG%20Central_files/header-compact.js): utility dropdown, responsive search, fit-based main-menu placement and mobile submenu Back controls
-- [Search _ NTG Central_files/search-autocomplete.js](Search%20_%20NTG%20Central_files/search-autocomplete.js): matching and accessible autocomplete interaction
-- [Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json): shared 1,116-record sanitized index
-- [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js): cached loading, validation and pure search model
-- [Search _ NTG Central_files/search-results.js](Search%20_%20NTG%20Central_files/search-results.js): query routing, result rendering, filters and local details
-- [Search _ NTG Central_files/search-results.css](Search%20_%20NTG%20Central_files/search-results.css): scoped Popular searches, responsive result layouts, and filter-control styling
-- [Search _ NTG Central_files/search-index.test.js](Search%20_%20NTG%20Central_files/search-index.test.js): Node regression suite
-- [Search _ NTG Central_files/main.css](Search%20_%20NTG%20Central_files/main.css): existing NTG design-system styles
-- [Search _ NTG Central_files/public-header.js](Search%20_%20NTG%20Central_files/public-header.js): profile-free public navigation and footer interactions
-- [Search _ NTG Central_files/public-icons.css](Search%20_%20NTG%20Central_files/public-icons.css): accessible icon-button labels and hidden profile controls
+- [Search \_ NTG Central.html](Search%20_%20NTG%20Central.html): page, header search form, and accessible autocomplete markup
+- [Search \_ NTG Central_files/header-compact.css](Search%20_%20NTG%20Central_files/header-compact.css): compact header, main search field, and suggestions styling
+- [Search \_ NTG Central_files/header-compact.js](Search%20_%20NTG%20Central_files/header-compact.js): utility dropdown, responsive search, fit-based main-menu placement and mobile submenu Back controls
+- [Search \_ NTG Central_files/search-autocomplete.js](Search%20_%20NTG%20Central_files/search-autocomplete.js): matching and accessible autocomplete interaction
+- [Search \_ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json): shared 1,116-record sanitized index
+- [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js): cached loading, validation and pure search model
+- [Search \_ NTG Central_files/search-results.js](Search%20_%20NTG%20Central_files/search-results.js): query routing, result rendering, filters and local details
+- [Search \_ NTG Central_files/search-results.css](Search%20_%20NTG%20Central_files/search-results.css): scoped Popular searches, responsive result layouts, and filter-control styling
+- [Search \_ NTG Central_files/search-index.test.js](Search%20_%20NTG%20Central_files/search-index.test.js): Node regression suite
+- [Search \_ NTG Central_files/main.css](Search%20_%20NTG%20Central_files/main.css): existing NTG design-system styles
+- [Search \_ NTG Central_files/public-header.js](Search%20_%20NTG%20Central_files/public-header.js): profile-free public navigation and footer interactions
+- [Search \_ NTG Central_files/public-icons.css](Search%20_%20NTG%20Central_files/public-icons.css): accessible icon-button labels and hidden profile controls
+- [Search _ NTG Central_files/ntg-central-logo.svg](Search%20_%20NTG%20Central_files/ntg-central-logo.svg): supplied outlined logo shared by header and footer
 - [scripts/build-public.js](scripts/build-public.js) and [scripts/check-public.js](scripts/check-public.js): static artifact generation and release checks
 - [scripts/preview-public.js](scripts/preview-public.js): repository-subpath preview server
 - [tests/public-site.spec.js](tests/public-site.spec.js): Chromium interaction and layout checks

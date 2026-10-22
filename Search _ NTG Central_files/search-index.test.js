@@ -174,10 +174,7 @@ test("related terms use relevant records, include indexed keywords, and cap at t
   assert.deepEqual(suggestRelatedTerms(fixture, "leavve xyz"), [
     "Apply for leave",
   ]);
-  assert.deepEqual(
-    suggestRelatedTerms(fixture, "leavve unrelated terms"),
-    [],
-  );
+  assert.deepEqual(suggestRelatedTerms(fixture, "leavve unrelated terms"), []);
   assert.deepEqual(suggestRelatedTerms(fixture, "zzzz"), []);
 });
 test("aliases support matching and spelling corrections", () => {
@@ -313,15 +310,18 @@ test("Funnelback conversion maps source facts and marks deterministic fallbacks"
 
 test("MFA source concepts support acronym autocomplete and spelling corrections", async () => {
   const related = [
-      "ICT induction",
-      "Microsoft Office 365",
-      "Be alert for fake Canvas emails",
-    ].map((title, index) => ({
-      title,
-      uri: `https://example.org/mfa-${index}`,
-      excerpt: "Use multi-factor authentication to protect your account.",
-      raw: { sysconcepts: "MFA ; 2FA ; 2SV ; multifactor authentication ; two-factor authentication ; two-step verification" },
-    }));
+    "ICT induction",
+    "Microsoft Office 365",
+    "Be alert for fake Canvas emails",
+  ].map((title, index) => ({
+    title,
+    uri: `https://example.org/mfa-${index}`,
+    excerpt: "Use multi-factor authentication to protect your account.",
+    raw: {
+      sysconcepts:
+        "MFA ; 2FA ; 2SV ; multifactor authentication ; two-factor authentication ; two-step verification",
+    },
+  }));
   const records = convertResults(related).records;
   assert.equal(records.length, 3);
   for (const alias of ["MFA", "2FA", "2SV"]) {
@@ -434,8 +434,21 @@ test("expanded index preserves curated records and supports every popular query"
       ({ record }) => record.label === "Mainframe password contacts",
     ),
   );
-  assert.ok(sourceRecords.every((record) => !record.url || record.url.startsWith("https:")));
-  assert.ok(records.every((record) => !record.phone && !record.extension && !record.location && !record.role && !record.source));
+  assert.ok(
+    sourceRecords.every(
+      (record) => !record.url || record.url.startsWith("https:"),
+    ),
+  );
+  assert.ok(
+    records.every(
+      (record) =>
+        !record.phone &&
+        !record.extension &&
+        !record.location &&
+        !record.role &&
+        !record.source,
+    ),
+  );
   assert.ok(
     records
       .filter((record) => record.demoFields?.includes("updated"))

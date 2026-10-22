@@ -5022,10 +5022,10 @@
       "NTG directory"
     ],
     "url": "https://ntgcentral.nt.gov.au/phones/details",
-    "email": "contact-demo@example.org",
     "demoFields": [
       "email"
-    ]
+    ],
+    "email": "contact-demo@example.org"
   },
   {
     "id": "fb-b5ce50c044a7ed88",
