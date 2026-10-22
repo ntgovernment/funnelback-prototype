@@ -101,6 +101,7 @@
 
     <link type="text/css" rel="stylesheet" href="./Search _ NTG Central_files/main.css">
     <link rel="stylesheet" href="./Search _ NTG Central_files/header-compact.css">
+    <script type="module" src="./Search _ NTG Central_files/search-autocomplete.js"></script>
 
 
     <link rel="stylesheet" href="./Search _ NTG Central_files/status-toolbar.css">
@@ -929,24 +930,24 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="ntgc-header__intro">
-
-
-
-
-                        <nav class="ntgc-breadcrumbs ntgc-breadcrumbs--dark" aria-label="breadcrumb">
-                            <ul>
-
-                                <li class="breadcrumb">
-                                    <a href="https://ntgcentral.nt.gov.au/">NTG Central</a>
-                                </li>
-
-
-                            </ul>
-                        </nav>
+                    <div class="ntgc-header__intro ntgc-search-intro">
                         <h1 class="ntgc-header__title px-0">Search</h1>
-
-
+                        <form action="https://ntgcentral.nt.gov.au/search" id="ntgc-site-search"
+                            class="ntgc-header-search" method="get" name="ntgc-site-search">
+                            <label class="sr-only" for="search">Search NTG Central</label>
+                            <input class="ntgc-search__text-input ntgc-search__text-input--white" id="search"
+                                name="searchterm" placeholder="Search for a page, contact, system or document"
+                                type="text" value="" autocomplete="off" role="combobox"
+                                aria-autocomplete="list" aria-expanded="false" aria-controls="search-suggestions">
+                            <button class="ntgc-search__submit" type="submit">
+                                <span class="fal fa-search" aria-hidden="true"></span>
+                                <span class="sr-only">Search</span>
+                            </button>
+                            <ul id="search-suggestions" class="ntgc-search-suggestions" role="listbox"
+                                aria-label="Search suggestions" hidden></ul>
+                            <span id="search-suggestions-status" class="sr-only" role="status" aria-live="polite"
+                                aria-atomic="true"></span>
+                        </form>
 
                     </div>
 
@@ -1067,22 +1068,6 @@
 
         <div class="ntgc-pt-48 mx-0">
             <div class="container">
-                <div class="col-lg-8 col-md-8 col-sm-l2 search-input">
-                    <div class="form-group">
-                        <div class="ntgc-search__wrapper_results">
-                            <form action="https://ntgcentral.nt.gov.au/search" autofill="false" id="ntgc-site-search"
-                                method="get" name="ntgc-site-search">
-                                <input class="ntgc-search__text-input ntgc-search__text-input--white" id="search"
-                                    name="searchterm" placeholder="Search for a page, contact, system or document"
-                                    type="text" value="">
-                                <button class="ntgc-search__submit" type="submit">
-                                    <span class="fal fa-search"></span>
-                                    <span class="sr-only">Search</span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
                 <div class="emptySearchContainer ntgc-pt-72 hidden"></div>
                 <!-- Tabs navigation -->
                 <div class="ntgc-tabs mt-5 results--tab" id="results-tabs" style="display: block;">
