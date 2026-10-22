@@ -1,2 +1,5 @@
 node_modules/
 top1000.json
+dist/
+playwright-report/
+test-results/

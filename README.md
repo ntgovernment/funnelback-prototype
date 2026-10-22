@@ -1,6 +1,57 @@
 # NTG Central Search Prototype
 
-Interactive NTG Central search prototype served locally with Vite. A shared 120-record synthetic index powers autocomplete and a Funnelback-style results interface with content types, filters, sorting and pagination. The first-load view shows Popular searches. The existing NTG header, design-system assets and footer are retained; no search backend or AI service is required.
+Interactive NTG Central search prototype with a shared 1,116-record index: 120 curated records and 996 imported records. Autocomplete, filtering, sorting and pagination run entirely in the browser; no search backend or AI service is required. The tracked HTML and index have been mechanically sanitized for public testing.
+
+## Public Deployment
+
+Tester URL: https://ntgovernment.github.io/funnelback-prototype/
+
+Source and documentation belong on `main`. The `gh-pages` branch contains only the generated site, including its root `index.html`, original named entry, local assets and `.nojekyll`. Initial publication commit: `03d3a2f`. GitHub Pages is configured to deploy from `gh-pages`, folder `/`. The latest HTTP check returned 404; confirm a successful Pages deployment before distributing this URL to participants.
+
+Build and validate a release from the source checkout:
+
+```bash
+npm ci
+npm test
+npm run test:public
+npm run build
+npm run check:public
+```
+
+`dist/` is the allowlisted public artifact, not a source checkout. It excludes the raw snapshot, tests, legacy profile scripts and analytics. The build strips real contact fields and private provenance, replaces contact addresses with `example.org`, and removes URL queries and fragments. It preserves approved live destinations, which may require NTG access. Automated sanitization does not certify free text or erase sensitive content from Git history; review content, assets and repository exposure before each release. Do not commit credentials or raw exports.
+
+For branch publishing, copy only the validated contents of `dist/` into a separate checkout of `gh-pages`, preserving that checkout's `.git` metadata. Remove obsolete published files, review the diff, commit and push `gh-pages`. Do not copy source files or `node_modules`, and do not rebuild inside a deployment checkout: the build replaces `dist/`. Pushing source changes to `main` alone does not update the site.
+
+The optional [Actions workflow](.github/workflows/deploy-pages.yml) uses a different publishing mode: GitHub Actions artifacts. To use it instead, change Settings > Pages > Source to GitHub Actions, then manually run the workflow on `main` with `publish` enabled and a review reference. It runs search, public-artifact and Chromium checks before deployment. Do not switch hosting modes merely to update documentation.
+
+Preview the production artifact at its repository subpath:
+
+```bash
+npm run preview:public
+```
+
+Open http://127.0.0.1:4175/funnelback-prototype/. For automated browser checks, install Chromium with `npx playwright install chromium`, then run `npm run test:browser`; Playwright starts or reuses this preview server. The kit must allow the preview hostname for those checks. After publishing, verify the root URL, `?searchterm=Apply%20for%20leave`, refresh, JSON/module responses, icons, keyboard interaction and mobile filters without an NTG login. A 404 requires checking the repository's Pages settings and deployment run; a pushed branch alone does not prove the site is available.
+
+## Workshop Testing
+
+Participants open the tester URL in a separate tab and return to the Optimal Workshop study to report completion and feedback. Confirm the URL is live and pilot on desktop and mobile before inviting testers. No Optimal Workshop SDK, recording, analytics or automatic task-success tracking is included.
+
+| Task | Observable success |
+| --- | --- |
+| Find guidance for applying for leave using search suggestions. | Select a relevant suggestion, submit and identify a relevant result. |
+| Narrow an `apply` search by result type, category and owner, then reset. | Results and counts change; clearing filters retains the query. |
+| Recover from `leavve`. | Use the offered `leave` correction and identify a relevant result. |
+| Find the Switchboard contact. | Identify the contact result; its address is demo data, not an operational contact. |
+| On mobile, change sort in Filter and sort, cancel, then apply it. | Cancel preserves the previous sort; Show results applies the draft. |
+| Inspect a demonstration record with no external destination. | Open its local detail dialog, close with Escape and recover focus. |
+
+Record completion, confidence and comments in the study. Do not ask participants to email or call demonstration contacts. Live links can leave the prototype; decide in advance whether following them is part of a task. In-place searches and filters do not update the URL, so URL observation alone cannot establish task success. Start each task from the root URL or an explicit `searchterm` link.
+
+## GitHub Pages Icons
+
+The public build (`npm run build`) loads Font Awesome kit `https://kit.fontawesome.com/9bf658a5c7.js` with `crossorigin="anonymous"`. It does not ship the local Free icon bundle or force Light icons to Solid. The public security policy permits Font Awesome scripts, styles, fonts and network requests; other external scripts remain blocked.
+
+Authorize `ntgovernment.github.io`, `localhost` and the preview host `127.0.0.1` in the kit's allowed domains, and enable the required Pro Light icons, legacy-class compatibility and CSS pseudo-element support. Icons require network access. Local development uses the same Pro kit as the Pages build. Numeric SVG geometry is preserved during contact redaction; screen-reader-only labels remain accessible without overlapping icon buttons.
 
 ## Run
 
@@ -13,7 +64,7 @@ npm run dev
 
 Vite opens [Search _ NTG Central.html](Search%20_%20NTG%20Central.html) at `http://localhost:5173/`. If that port is occupied, use the next available port printed by Vite, such as `http://localhost:5174/`. Serve the page through Vite rather than opening it directly from disk: autocomplete uses a JavaScript module and fetches a local JSON file.
 
-The supplied Font Awesome kit is authorized for `localhost`; `127.0.0.1` returns HTTP 403 and prevents icons from loading. Keep the browser on the `localhost` URL.
+Use `localhost` for the development URL. A 403 from the kit or its font requests requires checking the kit's allowed domains and license; the public and preview hosts require their own authorization.
 
 ### Demo Walkthrough
 
@@ -23,7 +74,7 @@ The supplied Font Awesome kit is authorized for `localhost`; `127.0.0.1` returns
 4. Search for `leavve` to see zero-result closest-match suggestions. Select one to run that related search, then select a result without an external destination to inspect its local demonstration record.
 5. Clear the main field and submit to return to Popular searches.
 
-Only the large main search field uses the local index. Header navigation, the compact navigation search and supplied external result links can lead to live sites that require network or NTG access.
+The large main search field uses the local index. Header navigation and supplied external result links can lead to live sites that require network or NTG access. The compact form has a local fallback action but no autocomplete; use the main field for study tasks.
 
 ## Header
 
@@ -31,11 +82,11 @@ The desktop utility row contains NTG Directory, NTG Policy Library, MyHR, MyForm
 
 The desktop main menu starts with My job; the Home item has been removed. Its final Online systems item opens `https://nt.gov.au/` in a new tab. This is separate from the utility-row Online systems link.
 
-The main header bands span the viewport while the Quick links and main-header contents are centered and capped at 1232px. A 1px `#384560` divider sits below the desktop Quick links row. The header uses 32px desktop edge padding and 16px mobile edge padding. Its 72px navy band (`#102040`) contains a white logo and bold Roboto navigation, a 294px by 40px white search pill, and a 40px green (`#208820`) avatar showing the current user's initial. Desktop profile controls show the avatar only; profile data and navigation destinations are unchanged.
+The main header bands span the viewport while the Quick links and main-header contents are centered and capped at 1232px. A 1px `#384560` divider sits below the desktop Quick links row. The header uses 32px desktop edge padding and 16px mobile edge padding. Its 72px navy band (`#102040`) contains a white logo, bold Roboto navigation and a 294px by 40px white search pill. The public prototype removes personalized profile controls and requests.
 
-Font Awesome is loaded from kit `https://kit.fontawesome.com/41b791824a.js` with `crossorigin="anonymous"`, replacing the local icon stylesheet. The kit provides compatibility styles for the snapshot's legacy `fas`/`fal` classes and CSS pseudo-element icons. It requires network access and `localhost` authorization. A 403 response from the kit prevents icons from rendering; check kit availability and allowed domains in Font Awesome. No additional npm dependency is needed.
+Font Awesome is loaded from kit `https://kit.fontawesome.com/9bf658a5c7.js` with `crossorigin="anonymous"`. The kit provides Pro Light icons and compatibility for legacy `fas`/`fal` classes and CSS pseudo-elements. It requires network access and authorization for the current hostname. The public build does not include the local Free icon bundle or override Light icons with Solid fonts.
 
-The main menu stays beside the logo, search, and avatar whenever the complete header row fits. It never moves into a separate white navigation row. JavaScript measures the intrinsic navigation width and available header space, checking again on resize, font loading and search expansion. When the items no longer fit, the inline navigation is replaced by a hamburger button that opens the same menu in a panel below the header. The fit threshold depends on available space and rendered content, not a fixed desktop breakpoint. At 768px and below, the mobile menu is always used and the avatar remains hidden.
+The main menu stays beside the logo and search whenever the complete header row fits. It never moves into a separate white navigation row. JavaScript measures the intrinsic navigation width and available header space, checking again on resize, font loading and search expansion. When the items no longer fit, the inline navigation is replaced by a hamburger button that opens the same menu in a panel below the header. The fit threshold depends on available space and rendered content, not a fixed desktop breakpoint. At 768px and below, the mobile menu is always used. Personalized avatars are not included.
 
 The mobile panel includes Back controls for returning from submenus. The menu button supports Enter and Space, exposes `aria-controls` and `aria-expanded`, and closes on Escape or outside clicks. Switching between inline and mobile layouts closes open navigation and resets submenu state. Focus moves to visible controls when needed. The utility dropdown also closes on outside click and Escape and keeps its `aria-expanded` state synchronized.
 
@@ -51,7 +102,7 @@ Arrow keys move through suggestions; selecting with Enter or a pointer fills the
 
 The field exposes combobox/listbox roles, its expanded state and active option, and a screen-reader status announcement. Keyboard navigation keeps focus in the input; Tab moves focus normally. Suggestions are rendered as text, not HTML.
 
-The main form is intercepted by the local results controller. Straight and curly apostrophes are removed consistently with the saved page's normalization. The compact navigation search is unchanged and still uses its live destination. There is no Funnelback server or AI integration.
+The main form is intercepted by the local results controller. Straight and curly apostrophes are removed consistently with the saved page's normalization. Both forms have local fallback actions; compact search is separate from the main autocomplete. There is no Funnelback server or AI integration.
 
 ## Popular Searches And Local Results
 
@@ -61,9 +112,9 @@ Popular-search links run local searches on ordinary clicks and have encoded same
 
 The URL is read only at startup. Refreshing restores its original query, not subsequent in-place searches or filters; browser Back does not undo those interactions. To share a query, set the `searchterm` parameter explicitly. Queries that normalize to no searchable letters or digits also show Popular searches.
 
-Results replace only the new main content region; the header, footer and shared scripts remain intact. The saved results remain hidden. Result types are All results, Information, Policy, Contact, Online system, Enterprise service, Agency, News and Event/Training. Their controls use Font Awesome Pro Light (`fal`) icons; other local search icons retain their existing Solid (`fas`) styling. The AI panel is intentionally omitted.
+Results replace the main content region while retaining the header and footer. Legacy saved results and embedded snapshot scripts have been removed. Result types are All results, Information, Policy, Contact, Online system, Enterprise service, Agency, News and Event/Training. Their controls use Font Awesome Pro Light (`fal`) icons; other local search icons retain their existing Solid (`fas`) styling. The AI panel is intentionally omitted.
 
-Contact results show the contact name, available role and content owner/department, followed by the visible email address and phone/extension. The name and contact methods remain actionable links. Contact results omit breadcrumbs, dates, excerpts and location. Demo contact fields appear as provided without a separate warning in the result; they remain marked as demo data in the index. On narrow screens, the role/department and contact methods stack vertically.
+Contact results show their approved title, content owner and a synthetic email address. Real roles, locations, phone numbers and extensions are stripped from the public dataset. Contact results omit breadcrumbs, dates, excerpts and location. Demo contact addresses remain actionable but are not operational support channels; they are marked as demo data in the index. On narrow screens, contact details stack vertically.
 
 Search matches all query words across titles, descriptions, keywords, owners, categories and contact metadata. The final word can be a prefix. Matching ignores case and punctuation, recognizes application/apply variants, and ranks exact titles and title prefixes first. The results heading includes the visible result range. “Did you mean?” suggestions appear above it when useful candidates are available, including for searches with results. Zero-result searches use spelling corrections when available; otherwise, a closest indexed title is suggested only when at least half of the meaningful query terms match closely. Suggestions are clickable and start a normal search; queries are never silently corrected, and unrelated queries do not receive arbitrary suggestions.
 
@@ -80,19 +131,20 @@ Real, supplied external destinations open in a new tab. Records without a destin
 
 ### Editing The Index
 
-[Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json) contains 120 curated synthetic records followed by records imported from the saved Funnelback response in [top1000.json](top1000.json). The original curated records stay first, and the original 24 IDs/labels remain unchanged. The current snapshot contributes 996 unique source records after URL deduplication. This local data is illustrative and is not a live or authoritative search index.
+[Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json) contains 120 curated records followed by 996 sanitized imported records. The original curated records stay first, and the original 24 IDs/labels remain unchanged. The private Funnelback snapshot, `top1000.json`, is ignored and is not required to run, test or build a clean checkout. This local data is illustrative and is not a live or authoritative search index.
 
-Regenerate the merged index after changing either the curated records or the Funnelback snapshot:
+Only maintainers with an approved private snapshot should regenerate the merged index. Regeneration can reintroduce real source contact details; sanitize the tracked files immediately afterwards, review the changes and rerun validation before committing:
 
 ```bash
 npm run generate:search-index
+node scripts/build-public.js --sanitize-source
 ```
 
 The generator reads the response's `results` array (not `totalCount`), preserves the curated records, replaces previously generated `fb-` records, and prints an audit report. It maps source titles, safe HTTPS destinations, excerpts, thesaurus/concept terms, readable asset lineage, agency owners, and valid `dctermsmodified` values. Type and category are inferred from source metadata; records without a confident category use `General information`. The existing result-type controls keep their current design and count the imported records. Directory pages listed under online systems remain systems; only clearly contact-focused source pages are classified as Contact.
 
 Content owner names follow the official [NT Government agencies directory](https://nt.gov.au/about-government/government-agencies). Department entries use the agency name without the trailing “Department of” wording. The generator maps recognized source sections and exact agency titles to those names; content shared across government or without a specific source mapping falls back to **Chief Minister and Cabinet**. Funnelback does not provide an authoritative owner field, so these assignments are inferred and should be verified before being treated as official ownership.
 
-Dates without a valid content-modified timestamp use a deterministic demo date. Generated contact and service email addresses use the reserved `example.org` domain and are marked as demo data in the index. Contact results show available values without a separate demo warning. Explicit contact details present in a source excerpt, such as the NTG Switchboard listing, are retained; the generator does not invent names, roles, phone numbers, or office locations. `sysdate` and `sysindexeddate` are indexing timestamps and are not used as content-update dates.
+Dates without a valid content-modified timestamp use a deterministic demo date. The generator can preserve real contact details from source excerpts; the public sanitizer removes them from fields and redacts contact patterns in text. Public contact and service addresses use the reserved `example.org` domain and are marked as demo data. The generator does not invent names, roles, phone numbers or office locations. `sysdate` and `sysindexeddate` are indexing timestamps and are not used as content-update dates.
 
 ```json
 [
@@ -113,15 +165,17 @@ Required fields are a unique lowercase ASCII `id` (letters, digits and hyphens),
 
 Autocomplete and results share one cached JSON request per page load, with no per-keystroke network requests or added dependencies. Suggestions use the same metadata-aware matching and ranking as results, including descriptions and keywords. A failed load is evicted from the cache so search can retry. If initial autocomplete loading fails, reload after restoring the data to restore suggestions. Text, query highlighting and record details are built using DOM text APIs, not HTML interpolation. Reload after editing the JSON; keep it valid JSON without comments or trailing commas.
 
-Popular-search labels and links are authored in [Search _ NTG Central.html](Search%20_%20NTG%20Central.html), separately from the index. When changing them, update the `popularSearches` export in [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js) as well, so coverage tests check the same queries. Ensure each popular query still matches an indexed record. The tests deliberately assert 120 records and the original first/24th labels; update those expectations only when intentionally changing the dataset contract.
+Popular-search labels and links are authored in [Search _ NTG Central.html](Search%20_%20NTG%20Central.html), separately from the index. When changing them, update the `popularSearches` export in [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js) as well, so coverage tests check the same queries. Ensure each popular query still matches an indexed record. Tests assert 1,116 total records, a 120-record curated prefix and the original first/24th labels; update those expectations only when intentionally changing the dataset contract.
 
 ## Validation
 
-Regenerate and validate the built-in Node test suite and syntax checks from the project root:
+Run the built-in Node suites, public build checks and syntax checks from the project root. These commands do not require the private snapshot:
 
 ```bash
-npm run generate:search-index
 npm test
+npm run test:public
+npm run build
+npm run check:public
 node --check scripts/generate-search-index.js
 node --check "Search _ NTG Central_files/search-index.js"
 node --check "Search _ NTG Central_files/search-results.js"
@@ -130,7 +184,7 @@ node --check "Search _ NTG Central_files/header-compact.js"
 node --check "Search _ NTG Central_files/global-v2.js"
 ```
 
-Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, related suggestions and closest-match fallback, safe destinations, record validation, shared loading/retry, deterministic Funnelback conversion, the 120-record curated prefix, imported Contact/system classification, and every popular query. There is no lint or build script.
+Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, related suggestions and closest-match fallback, safe destinations, record validation, shared loading/retry, deterministic conversion using synthetic fixtures, the curated prefix, imported classification and every popular query. Public-build tests additionally cover sanitization, the shared Pro kit and SVG preservation. There is no lint script. Playwright covers entry points, deep links, keyboard autocomplete, dialogs, mobile drafts, layouts and icons; kit access is required.
 
 For browser checks, use the localhost Vite URL and verify:
 
@@ -156,9 +210,9 @@ For browser checks, use the localhost Vite URL and verify:
 
 ### Known Limitations
 
-The saved page still references remote NTG fonts, icons, analytics, and APIs. CORS restrictions, network failures, or unavailable snapshot endpoints can cause missing assets and console errors independently of local search. The localhost Font Awesome restriction described above still applies.
+The public page uses local Roboto files and a remote Font Awesome Pro kit. Icons need network access and an authorized hostname. The build excludes snapshot analytics, profile integrations and legacy scripts; those unused legacy files may still exist in the source tree. Approved navigation links can lead to live NTG destinations outside the prototype.
 
-The local search UI requires JavaScript. If its module does not initialize, the saved main form's native action still points to the live NTG search endpoint and may leave the prototype. Popular searches markup is static, but running those queries requires the controller.
+The local search UI requires JavaScript. Both forms have local native actions, but results and suggestions require the controller to initialize. Popular searches markup is static, but running those queries requires JavaScript.
 
 This is an in-browser demonstration, not a production Funnelback integration: there is no crawler, remote index, authentication, access-control filtering, server-side search or generative AI. Matching normalizes text to ASCII letters and digits, so multilingual search is not implemented. All synthetic records, contacts and service-support addresses are demonstration data, not authoritative content or operational support channels.
 
@@ -168,11 +222,16 @@ This is an in-browser demonstration, not a production Funnelback integration: th
 - [Search _ NTG Central_files/header-compact.css](Search%20_%20NTG%20Central_files/header-compact.css): compact header, main search field, and suggestions styling
 - [Search _ NTG Central_files/header-compact.js](Search%20_%20NTG%20Central_files/header-compact.js): utility dropdown, responsive search, fit-based main-menu placement and mobile submenu Back controls
 - [Search _ NTG Central_files/search-autocomplete.js](Search%20_%20NTG%20Central_files/search-autocomplete.js): matching and accessible autocomplete interaction
-- [Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json): shared 120-record synthetic index
+- [Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json): shared 1,116-record sanitized index
 - [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js): cached loading, validation and pure search model
 - [Search _ NTG Central_files/search-results.js](Search%20_%20NTG%20Central_files/search-results.js): query routing, result rendering, filters and local details
 - [Search _ NTG Central_files/search-results.css](Search%20_%20NTG%20Central_files/search-results.css): scoped Popular searches, responsive result layouts, and filter-control styling
 - [Search _ NTG Central_files/search-index.test.js](Search%20_%20NTG%20Central_files/search-index.test.js): Node regression suite
-- [Search _ NTG Central_files/main.css](Search%20_%20NTG%20Central_files/main.css) and [Search _ NTG Central_files/global-v2.js](Search%20_%20NTG%20Central_files/global-v2.js): existing NTG design system and main-menu interactions
+- [Search _ NTG Central_files/main.css](Search%20_%20NTG%20Central_files/main.css): existing NTG design-system styles
+- [Search _ NTG Central_files/public-header.js](Search%20_%20NTG%20Central_files/public-header.js): profile-free public navigation and footer interactions
+- [Search _ NTG Central_files/public-icons.css](Search%20_%20NTG%20Central_files/public-icons.css): accessible icon-button labels and hidden profile controls
+- [scripts/build-public.js](scripts/build-public.js) and [scripts/check-public.js](scripts/check-public.js): static artifact generation and release checks
+- [scripts/preview-public.js](scripts/preview-public.js): repository-subpath preview server
+- [tests/public-site.spec.js](tests/public-site.spec.js): Chromium interaction and layout checks
 
-The matching compact-header Squiz template is maintained separately in `C:\Projects\compact-header\src\nester\`. Its export is generated with `npm run build` in that separate repository; this prototype has no build script. Changes here do not automatically update the Squiz template. Validate retained Squiz asset IDs in the NTG Central CMS before importing.
+The matching compact-header Squiz template is maintained separately in `C:\Projects\compact-header\src\nester\`. Its export is generated in that separate repository. This prototype's `npm run build` produces only the public static site; it does not export a Squiz template. Changes here do not automatically update the template.

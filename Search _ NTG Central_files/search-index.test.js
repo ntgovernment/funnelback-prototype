@@ -245,7 +245,7 @@ test("Funnelback conversion maps source facts and marks deterministic fallbacks"
       title: "NTG Switchboard",
       uri: "https://ntgcentral.nt.gov.au/phones/details?id=NTGSWITCHBOARD",
       excerpt:
-        "Phone 08 8999 5511 Internal Extension 95511 Email switchboard.ntg@nt.gov.au",
+        "Phone 08 8000 0000 Internal Extension 90000 Email switchboard@example.org",
       raw: {
         syssource: "switchboard",
         syscollection: "NTGC-col",
@@ -295,9 +295,9 @@ test("Funnelback conversion maps source facts and marks deterministic fallbacks"
   assert.ok(first.records[1].demoFields.includes("updated"));
   assert.equal(first.records[2].type, "Contact");
   assert.equal(first.records[2].owner, "Corporate and Digital Development");
-  assert.equal(first.records[2].email, "switchboard.ntg@nt.gov.au");
-  assert.equal(first.records[2].phone, "08 8999 5511");
-  assert.equal(first.records[2].extension, "95511");
+  assert.equal(first.records[2].email, "switchboard@example.org");
+  assert.equal(first.records[2].phone, "08 8000 0000");
+  assert.equal(first.records[2].extension, "90000");
   assert.ok(!first.records[2].demoFields?.includes("email"));
   assert.equal(
     first.records[3].description,
@@ -312,16 +312,16 @@ test("Funnelback conversion maps source facts and marks deterministic fallbacks"
 });
 
 test("MFA source concepts support acronym autocomplete and spelling corrections", async () => {
-  const response = JSON.parse(
-    await readFile(new URL("../top1000.json", import.meta.url), "utf8"),
-  );
-  const related = response.results.filter((record) =>
-    [
+  const related = [
       "ICT induction",
       "Microsoft Office 365",
       "Be alert for fake Canvas emails",
-    ].includes(record.title),
-  );
+    ].map((title, index) => ({
+      title,
+      uri: `https://example.org/mfa-${index}`,
+      excerpt: "Use multi-factor authentication to protect your account.",
+      raw: { sysconcepts: "MFA ; 2FA ; 2SV ; multifactor authentication ; two-factor authentication ; two-step verification" },
+    }));
   const records = convertResults(related).records;
   assert.equal(records.length, 3);
   for (const alias of ["MFA", "2FA", "2SV"]) {
@@ -398,9 +398,9 @@ test("expanded index preserves curated records and supports every popular query"
     (record) => record.label === "NTG Switchboard",
   );
   assert.equal(switchboard.type, "Contact");
-  assert.equal(switchboard.email, "switchboard.ntg@nt.gov.au");
-  assert.equal(switchboard.phone, "08 8999 5511");
-  assert.equal(switchboard.extension, "95511");
+  assert.equal(switchboard.email, "contact-demo@example.org");
+  assert.equal(switchboard.phone, undefined);
+  assert.equal(switchboard.extension, undefined);
   assert.equal(
     sourceRecords.find((record) => record.label === "Corporate Directory").type,
     "Online system",
@@ -434,11 +434,8 @@ test("expanded index preserves curated records and supports every popular query"
       ({ record }) => record.label === "Mainframe password contacts",
     ),
   );
-  assert.equal(
-    new Set(sourceRecords.map((record) => record.url)).size,
-    sourceRecords.length,
-  );
-  assert.ok(sourceRecords.every((record) => record.url.startsWith("https:")));
+  assert.ok(sourceRecords.every((record) => !record.url || record.url.startsWith("https:")));
+  assert.ok(records.every((record) => !record.phone && !record.extension && !record.location && !record.role && !record.source));
   assert.ok(
     records
       .filter((record) => record.demoFields?.includes("updated"))
