@@ -71,7 +71,7 @@ Search matches all query words across titles, descriptions, keywords, owners, ca
 - Type counts respect the query and category/owner selections but ignore the active type. Each facet's counts respect the other groups while ignoring its own selections.
 - Sort options are relevance, newest update, A-Z and Z-A. Undated records sort last by update date.
 - Ten results appear per page. Query, type, sort and filter changes reset to page one. Clear all filters retains the query and resets type, facets, sorting and page.
-- Show all expands categories. The owner selector supports multiple checkboxes, Escape, outside-click dismissal and keyboard focus restoration.
+- Show all expands categories. Sort uses 24px navy radio buttons; categories and owners use 24px navy checkboxes. Selected radios show a white center dot, and checked boxes show a white tick. Content-owner options have 64px-high rows, support multiple selections, close on Escape or outside clicks, and restore keyboard focus.
 - Below 900px, collapsible filters appear before the results. Popular searches stacks below 769px.
 
 Real, supplied external destinations open in a new tab. Records without a destination open an accessible local detail dialog rather than an invented live URL. Contact addresses use `example.org` and are not real staff details. Loading failures show a local Try again action; Popular searches does not require the index to load.
@@ -169,7 +169,7 @@ This is an in-browser demonstration, not a production Funnelback integration: th
 - [Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json): shared 120-record synthetic index
 - [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js): cached loading, validation and pure search model
 - [Search _ NTG Central_files/search-results.js](Search%20_%20NTG%20Central_files/search-results.js): query routing, result rendering, filters and local details
-- [Search _ NTG Central_files/search-results.css](Search%20_%20NTG%20Central_files/search-results.css): scoped Popular searches and responsive result layouts
+- [Search _ NTG Central_files/search-results.css](Search%20_%20NTG%20Central_files/search-results.css): scoped Popular searches, responsive result layouts, and filter-control styling
 - [Search _ NTG Central_files/search-index.test.js](Search%20_%20NTG%20Central_files/search-index.test.js): Node regression suite
 - [Search _ NTG Central_files/main.css](Search%20_%20NTG%20Central_files/main.css) and [Search _ NTG Central_files/global-v2.js](Search%20_%20NTG%20Central_files/global-v2.js): existing NTG design system and main-menu interactions
 
