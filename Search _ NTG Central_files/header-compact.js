@@ -4,26 +4,11 @@
     var inlineSlot = document.querySelector(
       "[data-mainmenu-inline-slot='true']",
     );
-    if (!mainMenu || !inlineSlot) {
+    var mobileSlot = document.querySelector("[data-mainmenu-mobile-slot='true']");
+    var header = document.querySelector(".ntgc-header__inner--main");
+    if (!mainMenu || !inlineSlot || !mobileSlot || !header) {
       return;
     }
-
-    var originalPosition = document.createComment("main menu position");
-    mainMenu.parentNode.insertBefore(originalPosition, mainMenu);
-
-    function updatePlacement() {
-      if (window.matchMedia("(min-width: 1296px)").matches) {
-        inlineSlot.appendChild(mainMenu);
-      } else {
-        originalPosition.parentNode.insertBefore(
-          mainMenu,
-          originalPosition.nextSibling,
-        );
-      }
-    }
-
-    updatePlacement();
-    window.addEventListener("resize", updatePlacement);
 
     var utilityLinkPatterns = [
       "phones.nt.gov.au",
@@ -46,6 +31,98 @@
         item.remove();
       }
     });
+
+    mainMenu.querySelectorAll(".menu-wrapper").forEach(function (wrapper) {
+      var list = wrapper.querySelector("ul.level-two");
+      if (!list || wrapper.querySelector(".mobile-nav-back-link")) {
+        return;
+      }
+      var backItem = document.createElement("li");
+      backItem.className = "mobile-nav-back-link";
+      var backButton = document.createElement("button");
+      backButton.type = "button";
+      var backIcon = document.createElement("span");
+      backIcon.className = "fal fa-chevron-left";
+      backIcon.setAttribute("aria-hidden", "true");
+      backButton.appendChild(backIcon);
+      backButton.appendChild(document.createTextNode(" Back"));
+      backItem.appendChild(backButton);
+      list.insertBefore(backItem, list.firstChild);
+    });
+
+    var row = inlineSlot.parentNode;
+    var toggle = row.querySelector(".toggle-mobile-nav");
+    var frame = null;
+    var currentMode = null;
+
+    function updatePlacement() {
+      frame = null;
+      var focusedElement = document.activeElement;
+      inlineSlot.classList.add("is-measuring");
+      inlineSlot.appendChild(mainMenu);
+      var requiredWidth = inlineSlot.getBoundingClientRect().width + 24;
+      var itemCount = 1;
+      Array.prototype.forEach.call(row.children, function (item) {
+        if (item === inlineSlot || item === toggle) {
+          return;
+        }
+        var style = window.getComputedStyle(item);
+        if (style.display === "none" || style.position === "absolute") {
+          return;
+        }
+        var width = item.getBoundingClientRect().width;
+        if (item.classList.contains("ntgc-header__search") &&
+            item.classList.contains("is-open") && window.innerWidth < 1296) {
+          width = Math.min(294, window.innerWidth - 160);
+        }
+        var marginLeft = item.classList.contains("ntgc-header__search") ? 0 : parseFloat(style.marginLeft) || 0;
+        requiredWidth += width + marginLeft +
+          (parseFloat(style.marginRight) || 0);
+        itemCount += 1;
+      });
+      requiredWidth += (itemCount - 1) * (parseFloat(window.getComputedStyle(row).columnGap) || 0);
+      inlineSlot.classList.remove("is-measuring");
+      var mode = window.innerWidth <= 768 || requiredWidth > row.clientWidth ? "mobile" : "inline";
+      if (mode === "mobile") {
+        mobileSlot.appendChild(mainMenu);
+      }
+      header.setAttribute("data-navigation-mode", mode);
+      document.body.classList.toggle("has-mobile-main-menu", mode === "mobile");
+      if (mode !== currentMode) {
+        document.dispatchEvent(new CustomEvent("ntgc:navigation-layout"));
+        currentMode = mode;
+        if (focusedElement && mainMenu.contains(focusedElement) && mode === "mobile") {
+          toggle.focus();
+        } else if (focusedElement === toggle && mode === "inline") {
+          mainMenu.querySelector("a").focus();
+        }
+      } else if (focusedElement && mainMenu.contains(focusedElement) && document.activeElement !== focusedElement) {
+        focusedElement.focus({ preventScroll: true });
+      }
+    }
+
+    function schedulePlacement() {
+      if (frame === null) {
+        frame = window.requestAnimationFrame(updatePlacement);
+      }
+    }
+
+    updatePlacement();
+    window.addEventListener("resize", schedulePlacement);
+    header.addEventListener("ntgc:search-layout", schedulePlacement);
+    if (window.ResizeObserver) {
+      var observer = new ResizeObserver(schedulePlacement);
+      observer.observe(row);
+      Array.prototype.forEach.call(row.children, function (item) {
+        if (item !== inlineSlot && item !== toggle) {
+          observer.observe(item);
+        }
+      });
+    }
+    if (document.fonts) {
+      document.fonts.ready.then(schedulePlacement);
+      document.fonts.addEventListener("loadingdone", schedulePlacement);
+    }
   }
 
   function closeUtilityDropdowns(utilityNav) {
@@ -81,6 +158,7 @@
 
       search.classList.toggle("is-open", isExpanded);
       submit.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+      header.dispatchEvent(new CustomEvent("ntgc:search-layout"));
       if (isExpanded) {
         input.focus();
       } else if (returnFocus) {
@@ -126,8 +204,8 @@
   }
 
   function initUtilityNavigation() {
-    placeMainMenu();
     initResponsiveSearch();
+    placeMainMenu();
     var utilityNav = document.querySelector(".ntgc-navigation--utility");
     if (!utilityNav) {
       return;

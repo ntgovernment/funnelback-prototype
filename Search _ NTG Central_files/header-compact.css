@@ -602,23 +602,181 @@
   }
 }
 
-@media (min-width: 1296px) {
-  .ntgc-header__inner--main-menu-origin {
-    display: none;
-  }
-
-  .ntgc-header__inner--main .ntgc-avatar__title {
+.ntgc-header__inner--main .ntgc-avatar__title {
     padding-right: 0;
-  }
+}
 
-  .ntgc-header__inline-main-menu {
+.ntgc-header__inner--main[data-navigation-mode="inline"] .ntgc-header__inline-main-menu,
+.ntgc-header__inline-main-menu.is-measuring {
     display: flex;
     margin-left: 24px;
+}
+
+.ntgc-header__inner--main .profile-firstname,
+.ntgc-header__inner--main .variant-toggle,
+.ntgc-header__inner--main #page-variant-list {
+    display: none;
+}
+
+.ntgc-header__inline-main-menu.is-measuring {
+  position: absolute;
+  visibility: hidden;
+  width: max-content;
+}
+
+.ntgc-header__inline-main-menu .ntgc-navigation--main {
+  flex: 0 0 auto;
+  position: relative;
+  width: max-content;
+}
+
+.ntgc-header__inline-main-menu .ntgc-navigation--main ul.level-one {
+  flex-direction: row;
+  position: static;
+  width: max-content;
+}
+
+.ntgc-header .ntgc-header__inner--main[data-navigation-mode="inline"] .toggle-mobile-nav {
+  display: none;
+}
+
+.ntgc-header .ntgc-header__inner--main[data-navigation-mode="mobile"] .toggle-mobile-nav {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  flex: 0 0 40px;
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+}
+
+.ntgc-header__inner--main .toggle-mobile-nav span.fal {
+  color: #fff;
+}
+
+.ntgc-header__mobile-menu {
+  display: none;
+}
+
+body.has-mobile-main-menu.menuopen .ntgc-header__mobile-menu {
+  background: #fff;
+  display: block;
+  left: 0;
+  margin: 0;
+  max-height: calc(100dvh - 80px);
+  overflow: auto;
+  padding: 0;
+  position: absolute;
+  right: 0;
+  z-index: 400;
+}
+
+.ntgc-header__mobile-menu > .row {
+  margin: 0;
+}
+
+.ntgc-header__mobile-menu [data-mainmenu-mobile-slot] {
+  padding: 0;
+}
+
+.ntgc-header__mobile-menu #mainmenu {
+  left: 0;
+  padding: 0;
+  position: relative;
+  top: 0;
+  transform: none;
+  transition: none;
+  width: 100%;
+}
+
+.ntgc-header__mobile-menu #mainmenu::before,
+.ntgc-header__mobile-menu #mainmenu::after,
+.ntgc-header__mobile-menu #mainmenu .menu-wrapper::before {
+  content: none;
+}
+
+.ntgc-header__mobile-menu #mainmenu ul {
+  flex-direction: column;
+  width: 100%;
+}
+
+.ntgc-header__mobile-menu #mainmenu ul.level-one {
+  display: block;
+  left: 0;
+  position: relative;
+  top: 0;
+  transition: none;
+}
+
+.ntgc-header__mobile-menu #mainmenu ul.level-one > li {
+  background: #fff;
+  border-bottom: 1px solid #ecf0f0;
+  display: block;
+  padding: 16px;
+}
+
+.ntgc-header__mobile-menu #mainmenu ul.level-one > li > a {
+  display: block;
+  font-size: 16px;
+  margin: 0;
+  padding-right: 32px;
+}
+
+.ntgc-header__mobile-menu #mainmenu ul.level-one > li .menu-wrapper {
+  display: none;
+  height: auto;
+  left: 0;
+  padding: 0;
+  position: relative;
+  right: auto;
+  top: 0;
+  transform: none;
+  transition: none;
+  width: 100%;
+  z-index: 1;
+}
+
+.ntgc-header__mobile-menu #mainmenu ul.level-one > li.active .menu-wrapper {
+  display: block;
+}
+
+.ntgc-header__mobile-menu #mainmenu[data-mobile-showlevel="leveltwo"] ul.level-one > li:not(.active),
+.ntgc-header__mobile-menu #mainmenu[data-mobile-showlevel="leveltwo"] ul.level-one > li.active > a {
+  display: none;
+}
+
+.ntgc-header__mobile-menu #mainmenu .menu-wrapper > div {
+  column-count: 1 !important;
+  width: 100% !important;
+}
+
+.ntgc-header__mobile-menu #mainmenu ul li.mobile-nav-back-link {
+  display: block !important;
+}
+
+.ntgc-header__mobile-menu #mainmenu .mobile-nav-back-link button {
+  background: transparent;
+  border: 0;
+  color: #102040;
+  cursor: pointer;
+  font: inherit;
+  font-size: 16px;
+  padding: 8px 0;
+  text-align: left;
+  width: 100%;
+}
+
+.ntgc-header__mobile-menu #mainmenu .mobile-nav-back-link button span.fal {
+  margin: 0;
+  position: static;
+}
+
+@media (min-width: 769px) {
+  .ntgc-header .ntgc-header__inner--main[data-navigation-mode="mobile"] .toggle-mobile-nav {
+    position: static;
   }
 
-  .ntgc-header__inner--main .profile-firstname,
-  .ntgc-header__inner--main .variant-toggle,
-  .ntgc-header__inner--main #page-variant-list {
+  .ntgc-header__mobile-menu #mainmenu ul.level-one > li.mobile-quick-links {
     display: none;
   }
 }

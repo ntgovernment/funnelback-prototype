@@ -23,6 +23,11 @@ $(document).ready(function() {
     $("#mainmenu").attr("data-mobile-showlevel", "leveltwo");
     $("body").addClass("shaded menuopen");
 
+    if ($('body').hasClass('has-mobile-main-menu')) {
+      $('.toggle-mobile-nav').attr('aria-expanded', 'true');
+      parent.find('.mobile-nav-back-link button').first().trigger('focus');
+    }
+
     return false;
   }
 
@@ -31,24 +36,33 @@ $(document).ready(function() {
     .on("click.dropdownMenu", handleDropdownClick);
 
     $('body').on('click', '.toggle-mobile-nav', function(e) {
-        console.log("mobile menu clicked");
         e.preventDefault();
         var menuIsOpen = $('body').hasClass('menuopen');
         if(menuIsOpen) {
-            //Close and reset the menu
-            $('body').removeClass("shaded menuopen");
-            $('#mainmenu').attr('data-mobile-showlevel', "levelone");
+        closeMenu();
         } else {
-            //Open the menu
             $('body').addClass("shaded menuopen");
+        $(this).attr('aria-expanded', 'true');
         }
+    });
+
+    $(document).on('ntgc:navigation-layout', closeMenu);
+
+    $('.toggle-mobile-nav').on('keydown', function(event) {
+      if (event.key === ' ') {
+        event.preventDefault();
+        $(this).trigger('click');
+      }
     });
 
 
     $("#mainmenu").on('click', '.mobile-nav-back-link', function(e) {
         e.preventDefault();
-        $(this).closest('li.active').removeClass('active');
+      var parent = $(this).closest('li.active');
+      parent.removeClass('active');
         $('#mainmenu').attr('data-mobile-showlevel', "levelone");
+        openMenuItem = null;
+      parent.children('a').first().trigger('focus');
     });
 
        
@@ -56,13 +70,16 @@ $(document).ready(function() {
   const $mainMenu = $("#mainmenu"); // Target the entire menu
   $(document).mouseup(function (e) {
     // If the target of the click isn't the menu AND isn't a descendant of the menu
-    if (!$mainMenu.is(e.target) && $mainMenu.has(e.target).length === 0) {
+    if (!$mainMenu.is(e.target) && $mainMenu.has(e.target).length === 0 && !$(e.target).closest('.toggle-mobile-nav').length) {
       closeMenu();
     }
   });
     
     $(document).on('keydown', function(event) {
        if (event.key == "Escape") {
+           if ($('body').hasClass('has-mobile-main-menu menuopen')) {
+             $('.toggle-mobile-nav').trigger('focus');
+           }
            closeMenu();
        }
    });
@@ -72,6 +89,7 @@ $(document).ready(function() {
     $("#mainmenu li.dropdown-skinny.active").removeClass("active");
     $("body").removeClass("shaded menuopen"); // Combined for efficiency
     $("#mainmenu").attr("data-mobile-showlevel", "levelone");
+    $('.toggle-mobile-nav').attr('aria-expanded', 'false');
     openMenuItem = null; // Add this line
   }
 

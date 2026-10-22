@@ -35,7 +35,11 @@ The main header bands span the viewport while the Quick links and main-header co
 
 Font Awesome is loaded from kit `https://kit.fontawesome.com/41b791824a.js` with `crossorigin="anonymous"`, replacing the local icon stylesheet. The kit provides compatibility styles for the snapshot's legacy `fas`/`fal` classes and CSS pseudo-element icons. It requires network access and `localhost` authorization. A 403 response from the kit prevents icons from rendering; check kit availability and allowed domains in Font Awesome. No additional npm dependency is needed.
 
-At viewport widths of 1296px and above, the existing main menu is placed beside the logo, search, and profile controls. Its original-position wrapper collapses while the menu is inline so it does not leave a strip below the header. Below 1296px the menu returns to that wrapper and the compact search collapses to an icon; the icon is white while shown alone. Activating it expands the search field to the left while keeping the icon fixed, where it returns to the dark color on the white field. This also applies to mobile, where the search expands above the menu items. Escape and outside clicks close the expanded search. At 768px and below the mobile menu is used. The JavaScript placement breakpoint and CSS breakpoint must remain synchronized. The utility dropdown closes on outside click and Escape and keeps its `aria-expanded` state synchronized.
+The main menu stays beside the logo, search, and avatar whenever the complete header row fits. It never moves into a separate white navigation row. JavaScript measures the intrinsic navigation width and available header space, checking again on resize, font loading and search expansion. When the items no longer fit, the inline navigation is replaced by a hamburger button that opens the same menu in a panel below the header. The fit threshold depends on available space and rendered content, not a fixed desktop breakpoint. At 768px and below, the mobile menu is always used and the avatar remains hidden.
+
+The mobile panel includes Back controls for returning from submenus. The menu button supports Enter and Space, exposes `aria-controls` and `aria-expanded`, and closes on Escape or outside clicks. Switching between inline and mobile layouts closes open navigation and resets submenu state. Focus moves to visible controls when needed. The utility dropdown also closes on outside click and Escape and keeps its `aria-expanded` state synchronized.
+
+The compact search independently collapses to an icon below 1296px; the icon is white while shown alone. Activating it expands the search field to the left while keeping the icon fixed, where it returns to the dark color on the white field. Search expansion can switch the main navigation to mobile mode if space becomes insufficient. This also applies to phones, where search retains its existing overlay behavior and the avatar stays hidden. Escape and outside clicks close the expanded search.
 
 ## Search Autocomplete
 
@@ -104,6 +108,8 @@ npm test
 node --check "Search _ NTG Central_files/search-index.js"
 node --check "Search _ NTG Central_files/search-results.js"
 node --check "Search _ NTG Central_files/search-autocomplete.js"
+node --check "Search _ NTG Central_files/header-compact.js"
+node --check "Search _ NTG Central_files/global-v2.js"
 ```
 
 Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, safe destinations, record validation, shared loading/retry, all 120 records and every popular query. There is no lint or build script.
@@ -115,8 +121,10 @@ For browser checks, use the localhost Vite URL and verify:
 3. Empty, whitespace-only and one-character input show no suggestions. `ap` or `Apply f` shows up to six; uppercase matches too. Arrow/Enter and pointer selection fill without submitting; Escape, Tab and outside clicks dismiss.
 4. Button/Enter submission stays local. `Apply f` returns multiple pages; type controls, all four sorts, combined category/owner filters, Show all, Clear all and pagination update rows/counts correctly and reset pages as documented.
 5. `leavve` offers `leave`; an unmatched query shows No results found. Empty submission restores Popular searches. Markup-like query text stays text. Local record details close with Escape and restore focus.
-6. At 320px/390px widths, Popular searches, result text and controls fit without horizontal scrolling; check filter collapse at 900px and retained header breakpoints at 768px/1296px.
+6. At 320px/390px widths, Popular searches, result text and controls fit without horizontal scrolling; check filter collapse at 900px, the phone header at 768px and compact search at 1296px.
 7. Confirm one shared JSON request on reload. Block it: Popular searches remains available, submissions show the local error, and Try again recovers after unblocking it. Check rapid submissions cannot render stale results.
+8. Check the header at 320, 390, 768, 769, 1024, 1295, 1296 and 1440px, then immediately either side of its measured fit threshold. There must be only one `#mainmenu`, no standalone white navigation row, and no wrapping or overlap between inline navigation, logo, search and avatar. When navigation cannot fit, the hamburger must be available instead.
+9. Expand and close compact search near the fit threshold; verify stable transitions between inline navigation and the mobile menu. Resize in both directions with menus open, and check submenu Back, Enter/Space on the menu button, Escape, outside clicks, focus restoration and `aria-expanded`. Repeat after fonts load or browser zoom changes. Existing Node tests do not cover header layout; these checks require a browser.
 
 ### Troubleshooting
 
@@ -140,7 +148,7 @@ This is an in-browser demonstration, not a production Funnelback integration: th
 
 - [Search _ NTG Central.html](Search%20_%20NTG%20Central.html): page, header search form, and accessible autocomplete markup
 - [Search _ NTG Central_files/header-compact.css](Search%20_%20NTG%20Central_files/header-compact.css): compact header, main search field, and suggestions styling
-- [Search _ NTG Central_files/header-compact.js](Search%20_%20NTG%20Central_files/header-compact.js): utility dropdown and responsive main-menu placement
+- [Search _ NTG Central_files/header-compact.js](Search%20_%20NTG%20Central_files/header-compact.js): utility dropdown, responsive search, fit-based main-menu placement and mobile submenu Back controls
 - [Search _ NTG Central_files/search-autocomplete.js](Search%20_%20NTG%20Central_files/search-autocomplete.js): matching and accessible autocomplete interaction
 - [Search _ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json): shared 120-record synthetic index
 - [Search _ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js): cached loading, validation and pure search model
