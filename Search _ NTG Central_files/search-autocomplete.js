@@ -1,3 +1,5 @@
+import { loadIndex } from './search-index.js';
+
 const form = document.getElementById('ntgc-site-search');
 const input = document.getElementById('search');
 const list = document.getElementById('search-suggestions');
@@ -125,13 +127,7 @@ if (form && input && list && status) {
   });
   form.addEventListener('submit', closeSuggestions);
 
-  fetch(new URL('./search-suggestions.json', import.meta.url))
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Search suggestions unavailable');
-      }
-      return response.json();
-    })
+  loadIndex()
     .then((data) => {
       if (!Array.isArray(data)) {
         throw new Error('Invalid search suggestions');

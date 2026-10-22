@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host localhost --open \"/Search%20_%20NTG%20Central.html\""
+    "dev": "vite --host localhost --open \"/Search%20_%20NTG%20Central.html\"",
+    "test": "node --test \"Search _ NTG Central_files/search-index.test.js\""
   },
   "devDependencies": {
     "vite": "^7.0.0"

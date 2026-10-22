@@ -102,6 +102,8 @@
     <link type="text/css" rel="stylesheet" href="./Search _ NTG Central_files/main.css">
     <link rel="stylesheet" href="./Search _ NTG Central_files/header-compact.css">
     <script type="module" src="./Search _ NTG Central_files/search-autocomplete.js"></script>
+    <link rel="stylesheet" href="./Search _ NTG Central_files/search-results.css">
+    <script type="module" src="./Search _ NTG Central_files/search-results.js"></script>
 
 
     <link rel="stylesheet" href="./Search _ NTG Central_files/status-toolbar.css">
@@ -1040,6 +1042,29 @@
     </script> <!--coveo_no_index_end_10-->
 
     <div id="content" class="ntgc-body">
+        <span id="local-search-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></span>
+        <main id="local-search" class="ntgc-local-search" aria-label="Search content">
+            <div class="local-search-inner local-popular">
+                <h2>Popular searches</h2>
+                <div class="local-popular-columns">
+                    <ul>
+                        <li><a href="?searchterm=My%20performance" data-popular="My performance">My performance <span class="fas fa-arrow-right" aria-hidden="true"></span></a></li>
+                        <li><a href="?searchterm=Emergency%20contacts" data-popular="Emergency contacts">Emergency contacts <span class="fas fa-arrow-right" aria-hidden="true"></span></a></li>
+                        <li><a href="?searchterm=myHR" data-popular="myHR">myHR <span class="fas fa-arrow-right" aria-hidden="true"></span></a></li>
+                    </ul>
+                    <ul>
+                        <li><a href="?searchterm=Apply%20for%20leave" data-popular="Apply for leave">Apply for leave <span class="fas fa-arrow-right" aria-hidden="true"></span></a></li>
+                        <li><a href="?searchterm=Job%20vacancies" data-popular="Job vacancies">Job vacancies <span class="fas fa-arrow-right" aria-hidden="true"></span></a></li>
+                        <li><a href="?searchterm=NTG%20Pay" data-popular="NTG Pay">NTG Pay <span class="fas fa-arrow-right" aria-hidden="true"></span></a></li>
+                    </ul>
+                    <ul>
+                        <li><a href="?searchterm=NTG%20Online%20Sytems" data-popular="NTG Online Sytems">NTG Online Sytems <span class="fas fa-arrow-right" aria-hidden="true"></span></a></li>
+                        <li><a href="?searchterm=The%20latest%20news" data-popular="The latest news">The latest news <span class="fas fa-arrow-right" aria-hidden="true"></span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+        <div class="ntgc-local-legacy" hidden>
 
 
 
@@ -1874,6 +1899,7 @@
 
         </div>
 
+        </div>
         <!--coveo_no_index_start_90-->
         <footer class="ntgc-body ntgc-body--dark ntgc-footer" role="contentinfo">
             <div class="container">
