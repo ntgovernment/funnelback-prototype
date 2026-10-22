@@ -59,6 +59,15 @@
 .ntgc-local-search .local-updated { font-size: 14px; line-height: 20px; color: var(--local-body); }
 .ntgc-local-search .local-contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 240px); gap: 20px; color: var(--local-body); }
 .ntgc-local-search .local-contact > div { min-width: 0; display: grid; align-content: start; gap: 8px; }
+.ntgc-local-search .local-result-contact { gap: 20px; }
+.ntgc-local-search .local-contact { grid-template-columns: minmax(0, 1fr) minmax(0, 320px); }
+.ntgc-local-search .local-contact > .local-contact-details { gap: 0; }
+.ntgc-local-search .local-contact-phone { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 4px; }
+.ntgc-local-search .local-contact .local-contact-link { color: var(--local-green); text-decoration: none; }
+.ntgc-local-search .local-contact-link:hover { text-decoration: underline; }
+.ntgc-local-search .local-contact-extension-label { color: var(--local-ink); }
+.ntgc-local-search .local-contact p,
+.ntgc-local-search .local-contact-methods { font-size: 16px; line-height: 24px; }
 .ntgc-local-search .local-contact a { color: #107810; overflow-wrap: anywhere; }
 .ntgc-local-search .local-actions { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; line-height: 20px; font-weight: 700; }
 .ntgc-local-search .local-actions a { color: var(--local-body); }

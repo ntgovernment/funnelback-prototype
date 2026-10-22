@@ -116,35 +116,29 @@ function destination(text, url, recordId, className = '') {
 }
 
 function renderRecord(record) {
-  const article = element('article', 'local-result');
+  const article = element('article', record.type === 'Contact' ? 'local-result local-result-contact' : 'local-result');
   article.dataset.recordId = record.id;
   const title = element('h3');
   title.append(destination(record.label, record.url, record.id, 'local-result-title'));
   article.append(title);
   if (record.type === 'Contact') {
-    const crumbs = element('div', 'local-breadcrumbs');
-    const path = ['NTG Central', ...(record.breadcrumbs || [])];
-    path.forEach((part, index) => {
-      if (index) crumbs.append(icon('fa-chevron-right'));
-      crumbs.append(element('span', '', part));
-    });
     const contact = element('div', 'local-contact');
-    const details = element('div');
+    const details = element('div', 'local-contact-details');
     if (record.role) details.append(element('p', '', record.role));
-    if (record.location) details.append(element('p', '', record.location));
-    if (!record.breadcrumbs?.some(part => normalize(part) === normalize(record.owner))) details.append(element('p', '', record.owner));
-    const actions = element('div');
-    if (record.email) {
-      const demoEmail = record.demoFields?.includes('email');
-      actions.append(destination(demoEmail ? 'Demo contact address' : 'Email contact', `mailto:${record.email}`, record.id));
-      if (demoEmail) actions.append(element('p', 'local-updated', 'Prototype placeholder only; not a staff contact.'));
+    if (record.owner) details.append(element('p', '', record.owner));
+    const actions = element('div', 'local-contact-methods');
+    if (record.email) actions.append(destination(record.email, `mailto:${record.email}`, record.id, 'local-contact-link'));
+    if (record.phone || record.extension) {
+      const phone = element('div', 'local-contact-phone');
+      if (record.phone) phone.append(destination(record.phone, `tel:${record.phone}`, record.id, 'local-contact-link'));
+      if (record.extension) {
+        phone.append(element('span', 'local-contact-extension-label', 'ext.'));
+        phone.append(element('span', 'local-contact-link', record.extension));
+      }
+      actions.append(phone);
     }
-    if (record.phone) actions.append(destination(record.phone, `tel:${record.phone}`, record.id));
-    if (record.extension) actions.append(element('p', '', `ext. ${record.extension}`));
     contact.append(details, actions);
-    const snippet = element('p', 'local-snippet');
-    snippet.append(highlight(record.description));
-    article.append(crumbs, contact, snippet);
+    article.append(contact);
   } else {
     const crumbs = element('div', 'local-breadcrumbs');
     const path = ['NTG Central', ...(record.breadcrumbs || [record.type, record.categories[0]])];
@@ -165,7 +159,7 @@ function renderRecord(record) {
       article.append(actions);
     }
   }
-  if (record.updated) {
+  if (record.type !== 'Contact' && record.updated) {
     const date = new Date(`${record.updated}T12:00:00Z`).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
     const label = record.demoFields?.includes('updated') ? 'Demo date' : 'Last updated';
     article.append(element('p', 'local-updated', `${label}: ${date}`));
