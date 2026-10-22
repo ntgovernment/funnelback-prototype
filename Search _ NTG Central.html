@@ -67,8 +67,7 @@
     <link type="text/css" rel="stylesheet" href="./Search _ NTG Central_files/yht7rxj.css">
 
 
-    <link rel="stylesheet" href="./Search _ NTG Central_files/all.css"
-        integrity="sha384-rqn26AG5Pj86AF4SO72RK5fyefcQ/x32DNQfChxWvbXIyXFePlEktwD18fEz+kQU" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/41b791824a.js" crossorigin="anonymous"></script>
     <!--<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.15.4/css/all.css" crossorigin="anonymous">-->
 
 
@@ -188,8 +187,8 @@
             </div>
         </div>
 
-        <div class="container header-wrapper">
-            <div class="ntgc-header__inner">
+        <div class="container header-wrapper header-wrapper--main">
+            <div class="ntgc-header__inner ntgc-header__inner--main">
                 <nav class="ntgc-navigation--secondary">
                     <ul class="level-one my-0">
                     </ul>
@@ -202,7 +201,7 @@
                         <div class="sr-only d-none">NTG Central</div>
 
 
-                        <div class="flex flex--left ntgc-py-16 ntgc-header__logo">
+                        <div class="flex flex--left ntgc-header__logo">
 
                             <a class="ntgc-logo" href="https://ntgcentral.nt.gov.au/">
                                 <svg class="Logo_NTG_Central" data-name="Logo NTG Central"
@@ -272,13 +271,13 @@
                     <div class="ntgc-header__inline-main-menu" data-mainmenu-inline-slot="true"></div>
 
                     <div class="col-xs-3 col-sm-4 col-md-6 ntgc-header__search">
-                        <div class="flex flex--center ntgc-py-16">
+                        <div class="flex flex--center">
                             <div class="ntgc-search__wrapper">
                                 <form action="https://ntgcentral.nt.gov.au/search" method="GET" name="ntgc-search-form">
-                                    <label for="search" class="ntgc-search__label">Search for a contact, system or
+                                    <label for="searchterm" class="ntgc-search__label">Search for a contact, system or
                                         keyword</label>
                                     <input type="text" id="searchterm" name="searchterm" class="ntgc-search__text-input"
-                                        placeholder="Search for a contact, system or keyword" value="">
+                                        placeholder="Search" value="">
 
                                     <button class="ntgc-search__submit" type="submit">
                                         <span class="fal fa-search"></span>
@@ -294,7 +293,7 @@
                     <div class="col-sm-4 col-md-3 ntgc-header__avatar">
 
 
-                        <div class="flex flex--right ntgc-py-16">
+                        <div class="flex flex--right">
 
 
                             <div id="myProfile" class="ntgc-avatar ntgc-avatar--current-user">
@@ -302,7 +301,7 @@
                                     <span class="ntgc-avatar__title">
 
                                         <a href="https://ntgcentral.nt.gov.au/search#" class="d-block"
-                                            title="Your profile, favourites and recent activity" id="refreshMyProfile">
+                                            title="Your profile, favourites and recent activity" aria-label="Your profile, favourites and recent activity" id="refreshMyProfile">
 
                                             <span class="profile-firstname pr-1">Roy</span>
 
@@ -345,6 +344,9 @@
             </div>
 
 
+        </div>
+
+        <div class="container header-wrapper">
             <div class="ntgc-header__inner">
                 <div class="row">
                     <div class="ntgc-profile d-sm-none d-md-block">
@@ -576,17 +578,12 @@
 
 
 
-            <div class="ntgc-header__inner">
+            <div class="ntgc-header__inner ntgc-header__inner--main-menu-origin">
                 <div class="row">
                     <div class="col-xs-12">
                         <nav class="ntgc-navigation--main" id="mainmenu" tabindex="-1"
                             aria-label="skip links navigation" data-mobile-showlevel="levelone">
                             <ul class="level-one">
-                                <li>
-                                    <a href="https://ntgcentral.nt.gov.au/" title="Home">
-                                        <span class="fas fa-home"></span>
-                                    </a>
-                                </li>
                                 <li>
 
                                     <a href="https://ntgcentral.nt.gov.au/my-job" class="dropdown">My job</a>
@@ -900,7 +897,7 @@
                                 <!--</li>-->
 
                                 <li>
-                                    <a href="https://nt.gov.au/" target="_blank">nt.gov.au</a>
+                                    <a href="https://nt.gov.au/" target="_blank">Online systems</a>
                                 </li>
 
 

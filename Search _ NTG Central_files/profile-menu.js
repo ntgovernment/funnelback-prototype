@@ -2,7 +2,8 @@ $(document).ready(function() {
     
     $('.ntgc-table-loader-animation.profile').hide();
 
-    $('#myProfile').click(function () {
+    $('#myProfile').click(function (event) {
+        event.preventDefault();
         if (!$('.ntgc-profile').hasClass('active')) {
             $('body').addClass('profileopen shaded--outsideprofile');
             $('.ntgc-profile').addClass('active');
@@ -16,10 +17,16 @@ $(document).ready(function() {
 
     $('body').on("click", function(event){
         var profileOpen = $('body').hasClass('profileopen');
-        if ($(event.target).closest("div").attr('class') != "ntgc-avatar__text" && !$(event.target).closest(".ntgc-profile").length) {
+        if (!$(event.target).closest("#myProfile, .ntgc-profile").length) {
             closeMenu()
         }
-    });    
+    });
+
+    $(document).on("keydown", function(event) {
+        if (event.key === "Escape") {
+            closeMenu();
+        }
+    });
 
     function closeMenu() {
         
