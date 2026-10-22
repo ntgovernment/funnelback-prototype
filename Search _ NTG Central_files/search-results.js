@@ -35,6 +35,10 @@ let categoriesExpanded = false;
 let filtersOpen = !mobile.matches;
 let sortOpen = true;
 let returnFocus;
+let draft;
+let categoryOpen = true;
+let savedOverflow;
+let savedScroll;
 
 function freshState(query) {
   return {
@@ -86,6 +90,7 @@ function showPopular(focus = false) {
 }
 
 async function submitQuery(query, focus = true) {
+  if (filterDialog.open) closeMobileFilters();
   const current = ++revision;
   const cleaned = String(query)
     .replace(/['\u2019]/g, "")
@@ -273,12 +278,13 @@ function choice(label, name, value, checked, kind, id) {
   return wrapper;
 }
 
-function renderFilters(result) {
+function renderFilters(result, selection = state, prefix = "local") {
+  const isDraft = prefix === "mobile";
   const panel = element("details", "local-filter-panel");
-  panel.open = filtersOpen;
+  panel.open = isDraft || filtersOpen;
   panel.append(element("summary", "", "Filter and sort"));
   panel.addEventListener("toggle", () => {
-    filtersOpen = panel.open;
+    if (!isDraft) filtersOpen = panel.open;
   });
   const content = element("div", "local-filter-content");
   const top = element("div", "local-filter-heading");
@@ -307,30 +313,31 @@ function renderFilters(result) {
     sorting.append(
       choice(
         label,
-        "local-sort",
+        `${prefix}-sort`,
         value,
-        state.sort === value,
+        selection.sort === value,
         "radio",
-        `local-sort-${value}`,
+        `${prefix}-sort-${value}`,
       ),
     );
   }
   sort.append(sorting);
   content.append(sort);
   const categoryGroup = element("fieldset");
+  categoryGroup.className = "local-category-group";
   categoryGroup.append(element("legend", "", "Category"));
   const visible = categoriesExpanded ? categories : categories.slice(0, 5);
   for (const category of categories.filter(
-    (value) => visible.includes(value) || state.categories.includes(value),
+    (value) => visible.includes(value) || selection.categories.includes(value),
   )) {
     categoryGroup.append(
       choice(
         `${category} (${result.categoryCounts[category]})`,
-        "local-category",
+        `${prefix}-category`,
         category,
-        state.categories.includes(category),
+        selection.categories.includes(category),
         "checkbox",
-        `local-category-${categories.indexOf(category)}`,
+        `${prefix}-category-${categories.indexOf(category)}`,
       ),
     );
   }
@@ -338,36 +345,46 @@ function renderFilters(result) {
     categoriesExpanded ? "Show fewer" : `Show all (${categories.length})`,
     "categories",
   );
-  expand.id = "local-show-categories";
+  expand.id = `${prefix}-show-categories`;
   expand.setAttribute("aria-expanded", String(categoriesExpanded));
   categoryGroup.append(expand);
-  content.append(categoryGroup);
+  if (isDraft) {
+    const category = element("details", "local-sort local-category-section");
+    category.open = categoryOpen;
+    const categorySummary = element("summary", "", "Category");
+    categorySummary.append(icon("fa-chevron-down"));
+    category.append(categorySummary, categoryGroup);
+    category.addEventListener("toggle", () => {
+      categoryOpen = category.open;
+    });
+    content.append(category);
+  } else content.append(categoryGroup);
   const owner = element("fieldset", "local-owner");
   owner.append(element("legend", "", "Content owner"));
   const trigger = button(
-    state.owners.length
-      ? `Selected (${state.owners.length})`
+    isDraft || selection.owners.length
+      ? `Selected (${selection.owners.length})`
       : "All content owners",
     "owners",
     "",
     "local-owner-trigger",
   );
-  trigger.id = "local-owner-trigger";
+  trigger.id = `${prefix}-owner-trigger`;
   trigger.setAttribute("aria-expanded", String(ownersOpen));
-  trigger.setAttribute("aria-controls", "local-owner-options");
+  trigger.setAttribute("aria-controls", `${prefix}-owner-options`);
   trigger.append(icon("fa-chevron-down"));
   const options = element("div", "local-owner-options");
-  options.id = "local-owner-options";
+  options.id = `${prefix}-owner-options`;
   options.hidden = !ownersOpen;
   Object.keys(result.ownerCounts).forEach((name, index) => {
     options.append(
       choice(
         `${name} (${result.ownerCounts[name]})`,
-        "local-owner",
+        `${prefix}-owner`,
         name,
-        state.owners.includes(name),
+        selection.owners.includes(name),
         "checkbox",
-        `local-owner-${index}`,
+        `${prefix}-owner-${index}`,
       ),
     );
   });
@@ -376,6 +393,129 @@ function renderFilters(result) {
   panel.append(content);
   return panel;
 }
+
+const filterDialog = element("dialog", "ntgc-local-search local-filter-dialog");
+filterDialog.setAttribute("aria-labelledby", "mobile-filter-title");
+const filterHeader = element("div", "local-mobile-filter-heading");
+const filterTitle = element("h2", "", "Filter and sort");
+filterTitle.id = "mobile-filter-title";
+const filterClose = button("", "cancel", "", "local-filter-close");
+filterClose.setAttribute("aria-label", "Close filter and sort");
+filterClose.title = "Close filter and sort";
+filterClose.append(icon("fa-xmark"));
+filterHeader.append(filterTitle, filterClose);
+const filterBody = element("div", "local-mobile-filter-body");
+const filterFooter = element("div", "local-mobile-filter-footer");
+const filterApply = button("", "apply", "", "local-filter-apply");
+const filterCount = element("span");
+filterCount.setAttribute("aria-live", "polite");
+filterCount.setAttribute("aria-atomic", "true");
+filterApply.append(filterCount);
+filterFooter.append(
+  filterApply,
+  button("Clear all filters", "clear", "", "local-text-button local-clear"),
+);
+filterDialog.append(filterHeader, filterBody, filterFooter);
+root.after(filterDialog);
+
+function positionMobileFilters() {
+  const band = document.querySelector(".header-wrapper--main");
+  const bottom = band?.getBoundingClientRect().bottom || 0;
+  filterDialog.style.setProperty("--local-filter-top", `${Math.max(0, bottom)}px`);
+}
+
+function refreshMobileFilters(rebuild = false) {
+  const result = searchIndex(records, draft);
+  if (rebuild) {
+    const activeId = document.activeElement?.id;
+    const scrollTop = filterBody.scrollTop;
+    const ownerScroll = filterBody.querySelector(".local-owner-options")?.scrollTop;
+    filterBody.replaceChildren(renderFilters(result, draft, "mobile"));
+    if (activeId) filterBody.querySelector(`[id="${activeId}"]`)?.focus({ preventScroll: true });
+    filterBody.scrollTop = scrollTop;
+    if (ownerScroll) filterBody.querySelector(".local-owner-options").scrollTop = ownerScroll;
+  }
+  filterBody.querySelectorAll('input[name="mobile-category"], input[name="mobile-owner"]').forEach((control) => {
+    const category = control.name === "mobile-category";
+    control.checked = draft[category ? "categories" : "owners"].includes(control.value);
+    control.nextElementSibling.textContent = `${control.value} (${(category ? result.categoryCounts : result.ownerCounts)[control.value]})`;
+  });
+  filterBody.querySelectorAll('input[name="mobile-sort"]').forEach((control) => {
+    control.checked = control.value === draft.sort;
+  });
+  const trigger = filterBody.querySelector(".local-owner-trigger");
+  trigger.firstChild.textContent = `Selected (${draft.owners.length})`;
+  filterCount.textContent = `Show ${result.total} ${result.total === 1 ? "result" : "results"}`;
+}
+
+function openMobileFilters() {
+  draft = { ...state, categories: [...state.categories], owners: [...state.owners] };
+  ownersOpen = false;
+  savedOverflow = document.documentElement.style.overflow;
+  savedScroll = window.scrollY;
+  window.scrollTo(0, 0);
+  positionMobileFilters();
+  refreshMobileFilters(true);
+  document.documentElement.style.overflow = "hidden";
+  filterDialog.showModal();
+  filterBody.scrollTop = 0;
+  filterClose.focus({ preventScroll: true });
+}
+
+function closeMobileFilters() {
+  filterDialog.close();
+  draft = undefined;
+  ownersOpen = false;
+  document.documentElement.style.overflow = savedOverflow;
+  window.scrollTo(0, savedScroll);
+  root.querySelector("#local-open-filters")?.focus({ preventScroll: true });
+}
+
+function cancelMobileFilters(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  if (ownersOpen) {
+    closeOwners();
+    filterBody.querySelector(".local-owner-trigger").focus();
+  } else closeMobileFilters();
+}
+filterDialog.addEventListener("cancel", cancelMobileFilters);
+filterDialog.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") cancelMobileFilters(event);
+});
+filterDialog.addEventListener("click", (event) => {
+  const control = event.target.closest("button[data-command]");
+  if (!control) return;
+  const command = control.dataset.command;
+  if (command === "cancel") return closeMobileFilters();
+  if (command === "apply") {
+    state = { ...draft, page: 1 };
+    closeMobileFilters();
+    renderResults();
+    root.querySelector("#local-open-filters")?.focus({ preventScroll: true });
+    return;
+  }
+  if (command === "clear") {
+    draft = freshState(state.query);
+    ownersOpen = false;
+  }
+  if (command === "owners") ownersOpen = !ownersOpen;
+  if (command === "categories") categoriesExpanded = !categoriesExpanded;
+  if (command === "clear") {
+    refreshMobileFilters();
+    closeOwners();
+  } else if (command === "owners") {
+    control.setAttribute("aria-expanded", String(ownersOpen));
+    filterBody.querySelector(".local-owner-options").hidden = !ownersOpen;
+  } else refreshMobileFilters(true);
+});
+filterDialog.addEventListener("change", (event) => {
+  updateSelection(draft, event.target, "mobile");
+  refreshMobileFilters();
+});
+window.addEventListener("resize", () => {
+  if (filterDialog.open) positionMobileFilters();
+});
 
 function renderPagination(result) {
   const navigation = element("nav", "local-pagination");
@@ -456,6 +596,27 @@ function renderResults(focus = false) {
     typeNavigation.append(control);
   });
   inner.append(typeNavigation);
+  const mobileControls = element("div", "local-mobile-controls");
+  const typeLabel = element("label", "sr-only", "Result type");
+  typeLabel.htmlFor = "local-type-select";
+  const typeSelect = element("select", "local-type-select");
+  typeSelect.id = "local-type-select";
+  typeSelect.name = "local-type";
+  ["", ...types].forEach((type) => {
+    const count = type ? result.typeCounts[type] : result.allCount;
+    const option = element("option", "", `${type || "All results"} (${count})`);
+    option.value = type;
+    option.selected = state.type === type;
+    typeSelect.append(option);
+  });
+  const filterTrigger = button("", "filters", "", "local-filter-trigger");
+  filterTrigger.id = "local-open-filters";
+  filterTrigger.setAttribute("aria-haspopup", "dialog");
+  filterTrigger.append(icon("fa-sliders-up", "fal"), element("span", "", "Filter and sort"), icon("fa-chevron-right", "fal"));
+  const typeSelectWrap = element("div", "local-type-select-wrap");
+  typeSelectWrap.append(typeSelect, icon("fa-chevron-down", "fal"));
+  mobileControls.append(typeLabel, typeSelectWrap, filterTrigger);
+  inner.append(mobileControls);
   const layout = element("div", "local-results-layout");
   const column = element("div", "local-results-column");
   if (result.total) {
@@ -570,6 +731,7 @@ root.addEventListener("click", (event) => {
   if (!control || control.disabled) return;
   const { command, value } = control.dataset;
   if (command === "record") return showRecord(value, control);
+  if (command === "filters") return openMobileFilters();
   if (command === "retry") return submitQuery(state.query);
   if (command === "correction") {
     input.value = value;
@@ -590,27 +752,33 @@ root.addEventListener("click", (event) => {
   renderResults(command === "page");
 });
 
-root.addEventListener("change", (event) => {
-  const control = event.target;
-  if (control.name === "local-sort") state.sort = control.value;
+function updateSelection(selection, control, prefix) {
+  if (control.name === `${prefix}-type`) selection.type = control.value;
+  else if (control.name === `${prefix}-sort`) selection.sort = control.value;
   else if (
-    control.name === "local-category" ||
-    control.name === "local-owner"
+    control.name === `${prefix}-category` ||
+    control.name === `${prefix}-owner`
   ) {
-    const key = control.name === "local-category" ? "categories" : "owners";
-    state[key] = control.checked
-      ? [...state[key], control.value]
-      : state[key].filter((value) => value !== control.value);
-  } else return;
-  state.page = 1;
+    const key = control.name === `${prefix}-category` ? "categories" : "owners";
+    selection[key] = control.checked
+      ? [...selection[key], control.value]
+      : selection[key].filter((value) => value !== control.value);
+  } else return false;
+  selection.page = 1;
+  return true;
+}
+
+root.addEventListener("change", (event) => {
+  if (!updateSelection(state, event.target, "local")) return;
   renderResults();
 });
 
 function closeOwners() {
   ownersOpen = false;
-  const trigger = root.querySelector("#local-owner-trigger");
+  const scope = filterDialog.open ? filterDialog : root;
+  const trigger = scope.querySelector(".local-owner-trigger");
   trigger?.setAttribute("aria-expanded", "false");
-  const options = root.querySelector("#local-owner-options");
+  const options = scope.querySelector(".local-owner-options");
   if (options) options.hidden = true;
 }
 
@@ -624,7 +792,7 @@ root.addEventListener("keydown", (event) => {
     root.querySelector("#local-owner-trigger")?.focus();
   }
 });
-root.addEventListener("focusout", (event) => {
+function dismissOwnersOnFocusOut(event) {
   if (
     ownersOpen &&
     event.target.closest(".local-owner") &&
@@ -632,8 +800,11 @@ root.addEventListener("focusout", (event) => {
     !event.relatedTarget.closest(".local-owner")
   )
     closeOwners();
-});
+}
+root.addEventListener("focusout", dismissOwnersOnFocusOut);
+filterDialog.addEventListener("focusout", dismissOwnersOnFocusOut);
 mobile.addEventListener("change", () => {
+  if (filterDialog.open) closeMobileFilters();
   filtersOpen = !mobile.matches;
   const panel = root.querySelector(".local-filter-panel");
   if (panel) panel.open = filtersOpen;
