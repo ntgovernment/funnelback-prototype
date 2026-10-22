@@ -61,7 +61,7 @@ Popular-search links run local searches on ordinary clicks and have encoded same
 
 The URL is read only at startup. Refreshing restores its original query, not subsequent in-place searches or filters; browser Back does not undo those interactions. To share a query, set the `searchterm` parameter explicitly. Queries that normalize to no searchable letters or digits also show Popular searches.
 
-Results replace only the new main content region; the header, footer and shared scripts remain intact. The saved results remain hidden. Result types are All results, Information, Policy, Contact, Online system, Enterprise service, Agency, News and Event/Training. The AI panel is intentionally omitted.
+Results replace only the new main content region; the header, footer and shared scripts remain intact. The saved results remain hidden. Result types are All results, Information, Policy, Contact, Online system, Enterprise service, Agency, News and Event/Training. Their controls use Font Awesome Pro Light (`fal`) icons; other local search icons retain their existing Solid (`fas`) styling. The AI panel is intentionally omitted.
 
 Search matches all query words across titles, descriptions, keywords, owners, categories and contact metadata. The final word can be a prefix. Matching ignores case and punctuation, recognizes application/apply variants, and ranks exact titles and title prefixes first. Conservative spelling suggestions require explicit selection; queries are never silently corrected.
 

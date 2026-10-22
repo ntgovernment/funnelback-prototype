@@ -5,7 +5,7 @@ const form = document.getElementById('ntgc-site-search');
 const input = document.getElementById('search');
 const status = document.getElementById('local-search-status');
 const popularTemplate = root.firstElementChild.cloneNode(true);
-const icons = ['fa-layer-group', 'fa-circle-info', 'fa-file-lines', 'fa-address-book', 'fa-laptop', 'fa-handshake', 'fa-building', 'fa-newspaper', 'fa-calendar-days'];
+const icons = ['fa-list-check', 'fa-circle-info', 'fa-file-lines', 'fa-address-book', 'fa-globe', 'fa-users', 'fa-building', 'fa-newspaper', 'fa-calendar-days'];
 const mobile = matchMedia('(max-width: 899px)');
 let records = [];
 let state = freshState('');
@@ -27,8 +27,8 @@ function element(tag, className, text) {
   return node;
 }
 
-function icon(name) {
-  const node = element('span', `fas ${name}`);
+function icon(name, style = 'fas') {
+  const node = element('span', `${style} ${name}`);
   node.setAttribute('aria-hidden', 'true');
   return node;
 }
@@ -279,7 +279,7 @@ function renderResults(focus = false) {
     const count = type ? result.typeCounts[type] : result.allCount;
     const control = button('', 'type', type, 'local-type-button');
     control.id = `local-type-${index}`;
-    control.append(icon(icons[index]), element('span', '', `${type || 'All results'} (${count})`));
+    control.append(icon(icons[index], 'fal'), element('span', '', `${type || 'All results'} (${count})`));
     control.setAttribute('aria-pressed', String(state.type === type));
     typeNavigation.append(control);
   });
