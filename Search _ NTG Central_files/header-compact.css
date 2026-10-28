@@ -125,6 +125,10 @@
   width: 100%;
 }
 
+.ntgc-header .ntgc-header__inner--utility:nth-of-type(1) {
+  z-index: 10001;
+}
+
 .ntgc-header .ntgc-header__inner:nth-of-type(1) {
   border-bottom-color: #384560;
 }
@@ -315,15 +319,27 @@
 .ntgc-header__inline-main-menu
   .ntgc-navigation--main
   ul.level-one
-  > li
-  > a:hover,
-.ntgc-header__inline-main-menu
-  .ntgc-navigation--main
-  ul.level-one
   > li.active
   > a {
   background: #ffffff26;
   color: #fff;
+}
+
+.ntgc-header__inline-main-menu .ntgc-navigation--main ul.level-one > li > a:hover {
+  background: transparent;
+  color: #fff;
+  text-decoration: underline;
+}
+
+.ntgc-header__inline-main-menu .ntgc-navigation--main ul.level-one > li.active > a:hover {
+  background: #ffffff26;
+}
+
+.ntgc-header .ntgc-navigation--main ul.level-two > li > a:hover,
+.ntgc-header .ntgc-navigation--main ul.level-three > li > a:hover,
+.ntgc-header .ntgc-navigation--main .dropdown-skinny ul a:hover {
+  color: #102040;
+  text-decoration: underline;
 }
 
 .ntgc-header__inline-main-menu
@@ -420,11 +436,19 @@
   cursor: pointer;
 }
 
-.ntgc-navigation--utility__list a:hover,
 .ntgc-navigation--utility__list a:focus-visible,
-.ntgc-navigation--utility__trigger:hover,
 .ntgc-navigation--utility__trigger:focus-visible {
   color: #20a030;
+}
+
+.ntgc-navigation--utility__list a:hover,
+.ntgc-navigation--utility__trigger:hover {
+  text-decoration: underline;
+}
+
+.ntgc-navigation--utility__list > li > a:hover:not(:focus-visible),
+.ntgc-navigation--utility__trigger:hover:not(:focus-visible) {
+  color: #fff;
 }
 
 .ntgc-utility-dropdown {
@@ -463,7 +487,6 @@
   padding: 8px 14px;
 }
 
-.ntgc-navigation--utility__submenu a:hover,
 .ntgc-navigation--utility__submenu a:focus-visible {
   background: #ecf0f0;
   color: #107810;
@@ -773,6 +796,21 @@ body.has-mobile-main-menu.menuopen .ntgc-header__mobile-menu {
   font-size: 16px;
   margin: 0;
   padding-right: 32px;
+}
+
+.ntgc-header__mobile-menu #mainmenu ul.level-one > li > a:hover {
+  text-decoration: underline;
+}
+
+.ntgc-header .ntgc-navigation--main ul.level-one > li > a.dropdown:hover,
+.ntgc-header__mobile-menu #mainmenu ul.level-one > li > a.dropdown:hover,
+.ntgc-header .ntgc-navigation--utility__trigger:hover {
+  text-decoration: none;
+}
+
+.ntgc-header .ntgc-navigation--main a.dropdown:hover > .ntgc-navigation__label,
+.ntgc-header .ntgc-navigation--utility__trigger:hover > .ntgc-navigation__label {
+  text-decoration: underline;
 }
 
 .ntgc-header__mobile-menu #mainmenu ul.level-one > li .menu-wrapper {
