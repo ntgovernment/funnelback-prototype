@@ -628,7 +628,6 @@ function renderResults(focus = false) {
     empty.append(
       element("h3", "", "No results found"),
       element("p", "", "Try another search term or remove filters."),
-      button("Clear all filters", "clear"),
     );
     column.append(empty);
   }
