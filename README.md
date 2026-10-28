@@ -130,7 +130,11 @@ Font Awesome is loaded from kit `https://kit.fontawesome.com/9bf658a5c7.js` with
 
 The main menu stays beside the logo and search whenever the complete header row fits. It never moves into a separate white navigation row. JavaScript measures the intrinsic navigation width and available header space, checking again on resize, font loading and search expansion. When the items no longer fit, the inline navigation is replaced by a hamburger button that opens the same menu in a panel below the header. The fit threshold depends on available space and rendered content, not a fixed desktop breakpoint. At 768px and below, the mobile menu is always used. Personalized avatars are not included.
 
+Hovering main-menu and Quick links items underlines the link label only; it does not change link color or background, and dropdown icons remain undecorated.
+
 The mobile panel includes Back controls for returning from submenus. The menu button supports Enter and Space, exposes `aria-controls` and `aria-expanded`, and closes on Escape or outside clicks. Switching between inline and mobile layouts closes open navigation and resets submenu state. Focus moves to visible controls when needed. The utility dropdown also closes on outside click and Escape and keeps its `aria-expanded` state synchronized.
+
+The utility-row Online systems button opens an All online systems submenu. The base stylesheet gives both the utility and main header sections a `z-index` of `10000`; the later main section can cover the open submenu. A narrowly scoped override in [header-compact.css](Search%20_%20NTG%20Central_files/header-compact.css) raises the utility section to `10001`. Keep this override on the utility section: increasing only the submenu's `z-index` cannot escape its parent's stacking context. The mobile utility-row hiding and Quick links behavior are unchanged.
 
 The compact search independently collapses to an icon below 1296px; the icon is white while shown alone. Activating it expands the search field to the left while keeping the icon fixed, where it returns to the dark color on the white field. Search expansion can switch the main navigation to mobile mode if space becomes insufficient. This also applies to phones, where search retains its existing overlay behavior and the avatar stays hidden. Escape and outside clicks close the expanded search.
 
@@ -239,6 +243,19 @@ npm run test:browser -- --grep "Central|mobile filter drafts|no-results section|
 ```
 
 These checks compare checkbox/radio states with an isolated upstream fixture, verify keyboard focus and nonblank white pixels in the embedded checkbox SVG, and check resolved tokens and unchanged header/footer styles at 320, 390, 900 and 1440px. They also exercise category/owner selection, mobile drafts, the empty state and shared logos. Screenshots are saved under the ignored test-results directory for inspection; they are not baseline image comparisons. Playwright serves the existing public artifact, so rebuild after source CSS changes. Use the loopback proxy exclusions documented above when needed.
+
+### Utility Dropdown Checks
+
+Run the focused Online systems regression checks against a fresh public build:
+
+```bash
+npm run build
+npm run test:browser -- --grep "Online systems"
+```
+
+The five tests in [tests/public-site.spec.js](tests/public-site.spec.js) verify that the submenu is unobstructed at 769, 900 and 1440px using browser hit-testing and a trial click, rather than relying only on a visibility assertion. They also check hover styling, link attributes, Enter/Space activation, Tab access, synchronized `aria-expanded`, and closing by second click, outside click and Escape. At 390 and 768px, they confirm that the utility bar stays hidden and Quick links remains visible when the mobile menu opens. Desktop/tablet screenshots are saved under the ignored test-results directory.
+
+Local verification on 28 October 2026 passed the build, all 9 public-build tests and all 5 utility-dropdown browser tests. Screenshots at 900 and 1440px confirmed the submenu appears above the main header. The full browser run passed 13 of 19 tests; the six failures concern the external-result-link assertion, spelling-correction assertion and four icon checks described below. This does not establish a passing full-suite release gate or publication of the updated artifact.
 
 ### Recorded Migration Checks
 

@@ -2,6 +2,117 @@ import { test, expect } from "@playwright/test";
 import { compileSearchDesignSystem, designSystemSources } from "../scripts/build-search-design-system.js";
 import { readFile } from "node:fs/promises";
 
+for (const width of [390, 900, 1440]) {
+  test(`Navigation hover only adds an underline at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("./");
+    const assertUnderlineOnly = async (link) => {
+      await page.mouse.move(0, 899);
+      const original = await link.evaluate(async (node) => {
+        await Promise.all(node.getAnimations().map((animation) => animation.finished));
+        const style = getComputedStyle(node);
+        return { color: style.color, background: style.backgroundColor };
+      });
+      await link.hover();
+      await expect(link).toHaveCSS("color", original.color);
+      await expect(link).toHaveCSS("background-color", original.background);
+      const label = link.locator(".ntgc-navigation__label");
+      if (await label.count()) {
+        await expect(link).toHaveCSS("text-decoration-line", "none");
+        await expect(label).toHaveCSS("text-decoration-line", "underline");
+        const icon = link.locator(".fa-chevron-down");
+        if (await icon.count()) {
+          await expect(icon).toHaveCSS("text-decoration-line", "none");
+          expect(await icon.evaluate((node) => getComputedStyle(node, "::before").textDecorationLine)).toBe("none");
+        } else {
+          expect(await link.evaluate((node) => getComputedStyle(node, "::before").textDecorationLine)).toBe("none");
+        }
+      } else {
+        await expect(link).toHaveCSS("text-decoration-line", "underline");
+      }
+    };
+
+    if (width > 768) {
+      await assertUnderlineOnly(page.locator(".ntgc-navigation--utility__list > li > a").first());
+      await assertUnderlineOnly(page.locator(".ntgc-navigation--utility__trigger").first());
+    }
+    const mobileMenu = await page.locator(".toggle-mobile-nav").isVisible();
+    if (mobileMenu) {
+      await page.locator(".toggle-mobile-nav").click();
+    }
+    const navigation = page.locator(".ntgc-navigation--main:visible");
+    const mainLink = navigation.locator("ul.level-one > li:visible > a").first();
+    await assertUnderlineOnly(mainLink);
+    await mainLink.click();
+    if (!mobileMenu) await assertUnderlineOnly(mainLink);
+    await assertUnderlineOnly(navigation.locator("ul.level-two > li > a:visible").first());
+  });
+}
+
+for (const width of [769, 900, 1440]) {
+  test(`Online systems dropdown stays above the main header at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("./?searchterm=apply");
+    const trigger = page.getByRole("button", { name: "Online systems", exact: true });
+    const dropdown = page.locator(".ntgc-utility-dropdown");
+    const submenu = page.locator("#online-systems-menu");
+    const link = submenu.getByRole("link", { name: "All online systems", exact: true });
+
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(dropdown).toHaveClass(/is-open/);
+    await expect(submenu).toBeVisible();
+    await expect(submenu).toHaveCSS("opacity", "1");
+    await expect.poll(() => link.evaluate((node) => {
+      const bounds = node.getBoundingClientRect();
+      const hit = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+      return node.contains(hit) ? "submenu link" : hit?.outerHTML.slice(0, 250);
+    })).toBe("submenu link");
+    await link.click({ trial: true });
+    const defaultColor = await link.evaluate((node) => getComputedStyle(node).color);
+    const defaultBackground = await link.evaluate((node) => getComputedStyle(node).backgroundColor);
+    await link.hover();
+    await expect(link).toHaveCSS("color", defaultColor);
+    await expect(link).toHaveCSS("background-color", defaultBackground);
+    await expect(link).toHaveCSS("text-decoration-line", "underline");
+    await expect(link).toHaveAttribute("href", "https://ntgcentral.nt.gov.au/online-systems");
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath(`online-systems-${width}.png`), animations: "disabled" });
+
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(submenu).not.toBeVisible();
+    await trigger.click();
+    await page.getByRole("heading", { name: "Search", exact: true }).click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(submenu).not.toBeVisible();
+
+    for (const key of ["Enter", "Space"]) {
+      await trigger.focus();
+      await trigger.press(key);
+      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+      await page.keyboard.press("Tab");
+      await expect(link).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(trigger).toHaveAttribute("aria-expanded", "false");
+      await expect(submenu).not.toBeVisible();
+    }
+  });
+}
+
+for (const width of [390, 768]) {
+  test(`Online systems utility bar remains hidden on mobile at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("./");
+    await expect(page.locator(".ntgc-header__inner--utility")).toBeHidden();
+    await expect(page.locator("#online-systems-menu")).toBeHidden();
+    await page.locator(".toggle-mobile-nav").click();
+    await expect(page.locator(".mobile-quick-links").first()).toBeVisible();
+  });
+}
+
 for (const width of [320, 390, 900, 1440]) {
   test(`Central tokens resolve without changing the shell at ${width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 900 });
