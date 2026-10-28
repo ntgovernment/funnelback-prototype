@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/ntgovernment/web-design-system-monorepo",
+  "branch": "dev",
+  "revision": "beef32e1e4f901e40ab00f0339dc4aaaa1597524",
+  "tokensRevision": "d9f7dd9c4304ed91068742fd5d7d7b05b637d713",
+  "retrieved": "2026-10-28",
+  "sourcePaths": {
+    "inputs.css": "design-system/ntg/src/css-components/forms/inputs/inputs.css",
+    "fa-solid.fa-check.white.svg": "design-system/ntg/src/css-components/forms/inputs/fa-solid.fa-check.white.svg",
+    "central.scoped.tokens.css": "packages/web-design-system-tokens/dist/tokens/0.0.1/central.scoped.tokens.css"
+  },
+  "licenseReview": "No repository-wide grant for NTG component CSS was found. Confirm redistribution permission before public release. The tokens package declares ISC. Preserve the Font Awesome notice in the checkbox SVG and review its applicable license.",
+  "files": {
+    "central.scoped.tokens.css": "6f82ffea8c52528f772fd5099c5ba48162544e211c7b1bf59fc4c69d9a73523a",
+    "inputs.css": "6b12186274ede82e2bcda10f0951ec29e87dc65ef5a91d2cfd53b0a1dec15606",
+    "fa-solid.fa-check.white.svg": "e38d64871103b2cb64264f8896234a6ef17da970f3b475d534bdbdf9f536a08c"
+  }
+}

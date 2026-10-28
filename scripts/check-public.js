@@ -5,9 +5,13 @@ import { fileURLToPath } from "node:url";
 import { parse } from "parse5";
 import { validateIndex } from "../Search _ NTG Central_files/search-index.js";
 import { publicIconKit, logoAsset, sanitizeRecords } from "./build-public.js";
+import { compileSearchDesignSystem, designSystemSources } from "./build-search-design-system.js";
 
 const root = path.resolve(fileURLToPath(new URL("../dist/", import.meta.url)));
 const assets = "Search _ NTG Central_files";
+const designSystemCss = await readFile(path.join(root, assets, "search-design-system.css"), "utf8");
+assert.equal(designSystemCss, await compileSearchDesignSystem(await designSystemSources()), "Public design-system CSS is stale");
+assert.equal(designSystemCss, await readFile(path.join(root, "..", assets, "search-design-system.css"), "utf8"), "Source and public design-system CSS differ");
 const expected = [
   ".nojekyll",
   "index.html",
@@ -64,6 +68,8 @@ const inspect = (node) => {
   for (const child of node.childNodes || []) inspect(child);
 };
 inspect(parse(html));
+assert.ok(localFiles.indexOf(`./${assets}/search-design-system.css`) >= 0);
+assert.ok(localFiles.indexOf(`./${assets}/search-design-system.css`) < localFiles.indexOf(`./${assets}/search-results.css`), "Design-system CSS must precede search layout overrides");
 assert.equal(kitCount, 1, "Expected exactly one approved Font Awesome kit");
 assert.equal(
   logoCount,

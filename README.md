@@ -48,7 +48,7 @@ Participants open the tester URL in a separate tab and return to the Optimal Wor
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
 | Find guidance for applying for leave using search suggestions.           | Select a relevant suggestion, submit and identify a relevant result.               |
 | Narrow an `apply` search by result type, category and owner, then reset. | Results and counts change; clearing filters retains the query.                     |
-| Recover from `leavve`.                                                   | Use the offered `leave` correction and identify a relevant result.                 |
+| Recover from `leavve`.                                                   | Select a suggested title, such as Apply for leave, and identify a relevant result. |
 | Find the Switchboard contact.                                            | Identify the contact result; its address is demo data, not an operational contact. |
 | On mobile, change sort in Filter and sort, cancel, then apply it.        | Cancel preserves the previous sort; Show results applies the draft.                |
 | Inspect a demonstration record with no external destination.             | Open its local detail dialog, close with Escape and recover focus.                 |
@@ -66,6 +66,28 @@ npm run test:browser -- --grep "both NTG logos"
 ```
 
 Logo rendering has also been checked at 390px and 1440px in local and production previews, including nonblank white-pixel checks. These local checks do not establish that the latest artifact has been published.
+
+## Search Design-System CSS
+
+Search results, filters and record dialogs use the NTG monorepo's Central tokens and native input styles. Header, navigation, footer and header-search styling are intentionally unchanged. The source is pinned to local `dev` revision `beef32e1e4f901e40ab00f0339dc4aaaa1597524`, with token outputs from submodule revision `d9f7dd9c4304ed91068742fd5d7d7b05b637d713`.
+
+The unmodified [vendor inputs and provenance](Search%20_%20NTG%20Central_files/vendor/ntg-design-system/manifest.json) contain the Central token CSS, input CSS and attributed Font Awesome check SVG. No Storybook preview CSS or upstream JavaScript is included. This snapshot does not establish a license grant: confirm permission to redistribute NTG component CSS and review the embedded icon's terms before public release.
+
+Regenerate the checked-in [scoped bundle](Search%20_%20NTG%20Central_files/search-design-system.css) offline:
+
+```bash
+npm run generate:design-system
+```
+
+Development and public builds regenerate it automatically. The [generator](scripts/build-search-design-system.js) verifies source checksums, compiles native nesting, scopes tokens and input selectors to `.ntgc-local-search` and `.local-record-dialog` (including backdrop tokens), namespaces the checkbox animation, and embeds the SVG. The selected input module has no imports or custom media to resolve; unexpected imports/assets fail closed. No global resets, theme changes, cascade layers or new external requests are introduced. Existing Roboto files are reused. The upstream spelling `--clr-action-pirmary` is preserved.
+
+The [search stylesheet](Search%20_%20NTG%20Central_files/search-results.css) consumes semantic color, spacing, typography, border, radius, shadow and focus tokens. Product-specific geometry remains local: the 1232px content width, 332px desktop filter column, 534px minimum search-section height and 900px filter breakpoint are preserved. Primitive typography tokens are used because some upstream composite aliases do not resolve. Native checkbox/radio state rules come from the source bundle rather than custom paint rules. Inputs retain upstream hover, focus, checked, disabled, readonly, error and success styling; readonly styling alone does not provide native checkbox/radio readonly semantics.
+
+Edit local presentation in the search stylesheet, not the generated bundle. The generated design-system stylesheet loads before the local search overrides. Its tokens apply to each search/dialog root and its backdrop rather than the document root; do not add a global Central theme to migrate the header or footer implicitly. The checkbox's embedded SVG works without the remote icon kit, but other interface icons still depend on that kit.
+
+To refresh, review the upstream changes and reuse permission, copy the same source modules from the chosen clean checkout, update both revisions and SHA-256 values in the manifest, regenerate, and run the public/build/browser checks. Do not edit the vendor inputs as local overrides or require the sibling checkout at build time. Browser checks compare native control states with an isolated upstream fixture and check token resolution, shell isolation, filtering and mobile draft behavior. `check:public` verifies that source and published bundles match.
+
+Keep the manifest's checksums aligned with the exact source bytes. The Git attributes preserve vendor files without line-ending conversion. A checksum mismatch stops generation: review the upstream change and refresh provenance deliberately rather than editing a checksum just to bypass the check. Before publishing, complete the component and icon permission review; a successful build does not resolve redistribution rights.
 
 ## GitHub Pages Icons
 
@@ -138,6 +160,8 @@ Contact results show their approved title, content owner and a synthetic email a
 
 Search matches all query words across titles, descriptions, keywords, owners, categories and contact metadata. The final word can be a prefix. Matching ignores case and punctuation, recognizes application/apply variants, and ranks exact titles and title prefixes first. The results heading includes the visible result range. “Did you mean?” suggestions appear above it when useful candidates are available, including for searches with results. Zero-result searches use spelling corrections when available; otherwise, a closest indexed title is suggested only when at least half of the meaningful query terms match closely. Suggestions are clickable and start a normal search; queries are never silently corrected, and unrelated queries do not receive arbitrary suggestions.
 
+The No results found section contains its heading and a prompt to try another query or remove filters; it does not duplicate the Clear all filters action. Clearing filters remains available in the desktop sidebar or mobile filter panel. The search section keeps a minimum height of 534px, including popular-search and empty states.
+
 - Categories and owners use OR within each group, AND across groups and the selected result type.
 - Type counts respect the query and category/owner selections but ignore the active type. Each facet's counts respect the other groups while ignoring its own selections.
 - Sort options are relevance, newest update, A-Z and Z-A. Undated records sort last by update date.
@@ -204,7 +228,23 @@ node --check "Search _ NTG Central_files/header-compact.js"
 node --check "Search _ NTG Central_files/global-v2.js"
 ```
 
-Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, related suggestions and closest-match fallback, safe destinations, record validation, shared loading/retry, deterministic conversion using synthetic fixtures, the curated prefix, imported classification and every popular query. Public-build tests additionally cover sanitization, the shared Pro kit, numeric SVG geometry and conversion of both logos to the supplied asset. Artifact checks verify the SVG byte-for-byte. There is no lint script. Playwright covers entry points, deep links, keyboard autocomplete, dialogs, mobile drafts, layouts, shared logos and icons; icon checks require kit access.
+Tests cover normalization, URL query parsing, token/prefix/synonym matching, ranking, grouped filters, disjunctive counts, sorting, pagination boundaries, corrections, related suggestions and closest-match fallback, safe destinations, record validation, shared loading/retry, deterministic conversion using synthetic fixtures, the curated prefix, imported classification and every popular query. Public-build tests additionally cover sanitization, the shared Pro kit, numeric SVG geometry, conversion of both logos to the supplied asset, pinned design-system checksums, deterministic scoped CSS, embedded assets and consumed token names. Artifact checks verify the SVG byte-for-byte and require identical generated design-system CSS in source and public assets. There is no lint script. Playwright covers entry points, deep links, keyboard autocomplete, dialogs, mobile drafts, layouts, shared logos and icons; icon checks require kit access.
+
+Run the focused Central migration checks against a fresh public build:
+
+```bash
+npm run build
+npm run check:public
+npm run test:browser -- --grep "Central|mobile filter drafts|no-results section|both NTG logos"
+```
+
+These checks compare checkbox/radio states with an isolated upstream fixture, verify keyboard focus and nonblank white pixels in the embedded checkbox SVG, and check resolved tokens and unchanged header/footer styles at 320, 390, 900 and 1440px. They also exercise category/owner selection, mobile drafts, the empty state and shared logos. Screenshots are saved under the ignored test-results directory for inspection; they are not baseline image comparisons. Playwright serves the existing public artifact, so rebuild after source CSS changes. Use the loopback proxy exclusions documented above when needed.
+
+### Recorded Migration Checks
+
+Local verification on 28 October 2026 passed 13 search unit tests, 9 public-build tests, artifact checks and all 8 focused browser checks. This is a local verification record, not evidence that the updated artifact has been published or that the full browser suite passes.
+
+The full browser run exposed six failures independently reproduced with pre-migration search assets: its external-link assertion assumes the first `apply` results page contains an external title link; its correction assertion expects a literal `leave` button rather than the current suggested record titles; and four viewport icon checks fail when the Font Awesome kit returns HTTP 403. The observed correction titles were Leave entitlements, Apply for leave and Annual leave policy. Resolve the stale data assertions and kit authorization before treating the full browser suite as a release gate that passes. The focused command above does not replace that full-suite gate.
 
 For browser checks, use the localhost Vite URL and verify:
 

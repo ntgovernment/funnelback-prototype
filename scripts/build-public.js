@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import postcss from "postcss";
 import valueParser from "postcss-value-parser";
+import { buildSearchDesignSystem } from "./build-search-design-system.js";
 import { validateIndex } from "../Search _ NTG Central_files/search-index.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -22,6 +23,7 @@ const scripts = [
 ];
 const styles = [
   "main.css",
+  "search-design-system.css",
   "header-compact.css",
   "search-results-support.css",
   "search-results.css",
@@ -312,6 +314,7 @@ export function sanitizeHtml(source, { development = false } = {}) {
 }
 
 export async function buildPublic() {
+  await buildSearchDesignSystem();
   const html = sanitizeHtml(await readFile(path.join(root, entry), "utf8"));
   const records = sanitizeRecords(
     JSON.parse(

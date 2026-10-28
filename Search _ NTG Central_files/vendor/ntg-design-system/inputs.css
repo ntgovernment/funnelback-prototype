@@ -1,0 +1,260 @@
+/* 
+* Most inputs are effectively the same.
+* Text like entry field with border etc.
+* So target just excluding these:
+* color, checkbox, radio, range
+*
+* NOTE: submit, button and reset are defined
+*       in buttons.css (squiz uses inputs as buttons)
+*/
+
+/**
+* Shared variables and states for text like, radio and checkboxes
+* only add what will be compatible with all those
+*/
+input:not([type=range], [type=submit], [type=button], [type=reset]) {
+    --height: 52px;
+    --outline-color: var(--outline-focus-color);
+    --status-inset-shadow: 0 0 0 transparent;
+    --shadow: var(--input-shadow, 0 0 0 transparent);
+    --border-width: var(--border-width-md);
+    --border-color: var(--clr-border-strong-02);
+    --background-color: var(--clr-bg-default);
+    --timing: var(--timing-fast, .15s);
+    --easing: ease-in-out;
+
+    &[readonly],
+    &[disabled] {
+        --background-color: var(--clr-bg-shade-alt);
+        --border-color: var(--clr-border-subtle);
+    }
+
+    &[disabled] {
+        pointer-events: none;
+    }
+
+    &.--hover,
+    label.--hover & {
+        --background-color: var(--clr-bg-shade-alt);
+    }
+    @media(hover:hover) {
+        &:hover,
+        label:hover & {
+             --background-color: var(--clr-bg-shade-alt);
+        }
+    }
+
+    &:focus,
+    &.--focus {
+        &:not([disabled]) {
+            outline: var(--outline-focus);
+            outline-color: var(--outline-color);
+        }
+    }
+
+    outline: 0 solid var(--outline-color);
+    &:focus,
+    &.--focus {
+        &:not([disabled]) {
+            outline: var(--outline-focus);
+            outline-color: var(--outline-color);
+        }
+    }
+
+    &.--success {
+        --border-color: var(--clr-status-success);
+
+        &:focus,
+        &.--focus {
+            --status-inset-shadow: inset 0 0 0 2px var(--clr-status-success);
+        }
+    }
+
+    &.--error {
+        --border-color: var(--clr-status-danger);
+
+        &:focus,
+        &.--focus {
+            --status-inset-shadow: inset 0 0 0 2px var(--clr-status-danger);
+        }
+    }
+
+    --transition: 
+        color var(--timing) var(--easing),
+        background-color var(--timing) var(--easing),
+        border-color var(--timing) var(--easing),
+        box-shadow var(--timing) var(--easing),
+        outline var(--timing) var(--easing);
+
+    appearance: none;
+    border: var(--border-width) solid var(--border-color);
+    background: var(--background-color);
+    color: var(--color);
+    box-shadow: var(--status-inset-shadow),
+    var(--shadow);
+    transition:  var(--transition), background-size var(--timing) var(--easing);
+}
+
+input[readonly]:is([type=checkbox], [type=radio]){
+    pointer-events: none;
+}
+
+:root {
+    --checked-background-size: 1.2rem;
+}
+
+input[type="checkbox"] {
+    /* inherits vars and state from above */
+    /* Reset and base sizing */
+    --height: 1.5rem;
+    --border-width: 2px;
+    &:checked {
+        --background-color: var(--border-color) !important;
+        --status-inset-shadow: inset 0 0 0 3px var(--border-color);
+        background-size: var(--checked-background-size);
+        animation: var(--timing) var(--easing) animate-checkbox-checked;
+    }
+    &[readonly]:not([disabled]) {
+        --background-color: var(--clr-bg-default);
+    }
+    display: inline-block;
+    width: var(--height);
+    height: var(--height);
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+    border-radius: 3px;
+    vertical-align: top;
+    /* transition: var(--transition); */
+    /**
+     * NOTE: Please don't do this normally for icons
+     *       use <i class="fa-solid fa-*"> etc
+     *       we need to here due to checkbox limitations 
+     */
+    background: var(--background-color) center / 0 no-repeat url(./fa-solid.fa-check.white.svg);
+}
+@keyframes animate-checkbox-checked {
+    0%, 30% {
+        background-size: 0;
+    }
+    31% {
+        background-size: .5rem;
+    } 
+    100% {
+        background-size: 1.2rem;
+    }
+}
+
+input[type="radio"] {
+    /* inherits vars and state from above */
+    /* Reset and base sizing */
+    --height: 1.5rem;
+    --border-width: 2px;
+    &:checked {
+        --border-width: 7px;
+    }
+    &[readonly]:not([disabled]) {
+        --background-color: var(--clr-bg-default);
+    }
+    display: inline-block;
+    width: var(--height);
+    height: var(--height);
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+    border-radius: 50%;
+    vertical-align: top;
+    transition: var(--transition), border-width var(--timing) var(--easing);
+}
+
+input:not([type=radio], [type=checkbox], [type=range], [type=submit], [type=button], [type=reset]) {
+    /* inherits vars and states from above */
+    --padding-inline: var(--sp-md);
+    --color: var(--clr-text-default);
+
+    /* &:not(:placeholder-shown) {
+        --border-color: var(--clr-border-subtle);
+    } */
+    &[data-has-value] {
+        --border-color: var(--clr-border-subtle);
+    }
+
+    &::placeholder {
+        --color: var(--clr-text-alt);
+        opacity: 1;
+    }
+
+    height: var(--height);
+    padding: 0 var(--padding-inline);
+    /* padding: 0 .25rem;
+    text-indent: calc(var(--padding-inline) - .25rem); */
+    
+
+    /**
+    * .clearable-input is a js enhancement
+    * inputs with [data-clear] will be wrapped and enhanced with clear button
+    */
+
+    /* 
+    I was using placeholder-shown to hide the clear button but
+    it doesnt work for date, time etc so since I have to do that 
+    with js may as well use the js tracked [data-has-value] attr for all
+    .clearable-input &:placeholder-shown ~ .clearable-input__button {
+        opacity: 0;
+        pointer-events: none;
+    } 
+    */
+    .clearable-input &~.clearable-input__button {
+        opacity: var(--clearable-button-hidden-opacity);
+        pointer-events: none;
+    }
+}
+
+/* js enhancement */
+.clearable-input {
+    position: relative;
+    display: inline-block;
+
+    input[data-clear] {
+        padding-right: calc(var(--padding-inline) + 1.1rem);
+
+        &[type="search"]::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        &[data-has-value]~.clearable-input__button {
+            --clearable-button-hidden-opacity: 1;
+            pointer-events: all;
+        }
+    }
+
+    .clearable-input__button {
+        --clearable-button-hidden-opacity: 0;
+
+        input:is([type=date], [type=time], [type=datetime-local])~&,
+        input:not([data-type-fallback]):is([type=month], [type=week])~& {
+            --clearable-button-hidden-opacity: .2;
+        }
+
+        position: absolute;
+        top: 50%;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        height: 1.5rem;
+        margin: -.75rem .5rem 0 0;
+        aspect-ratio: 1;
+        background: rgb(from var(--clr-bg-shade-alt) r g b / 0.8);
+        border-radius: 100%;
+        cursor: pointer;
+        transition: opacity var(--timing-normal);
+    }
+}
+
+input [type=range] {}

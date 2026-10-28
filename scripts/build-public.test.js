@@ -1,5 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import postcss from "postcss";
+import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { compileSearchDesignSystem, designSystemSources } from "./build-search-design-system.js";
 import {
   sanitizeHtml,
   sanitizeRecords,
@@ -77,6 +81,44 @@ test("snapshot CSS cannot request external or root-relative assets", () => {
   assert.ok(!css.includes("/?a="));
   assert.ok(css.includes("data:image"));
   assert.ok(css.includes("Font Awesome 5 Pro"));
+});
+
+test("Central input bundle is deterministic, scoped and safe for public CSS sanitization", async () => {
+  const sources = await designSystemSources();
+  const css = await compileSearchDesignSystem(sources);
+  assert.equal(css, await compileSearchDesignSystem(sources));
+  assert.equal(sanitizeCss(css), css);
+  assert.ok(css.includes("--clr-action-pirmary:"));
+  assert.ok(css.includes("data:image/svg+xml,"));
+  assert.ok(css.includes("Font%20Awesome"));
+  assert.ok(css.includes("local-ntg-checkbox-checked"));
+  assert.ok(!css.includes(":root"));
+  const root = postcss.parse(css);
+  root.walkRules((rule) => {
+    if (rule.parent.type === "atrule" && rule.parent.name === "keyframes") return;
+    for (const selector of rule.selectors)
+      assert.ok(selector.startsWith(":is(.ntgc-local-search, .local-record-dialog)"), selector);
+    assert.ok(!rule.nodes.some((node) => node.type === "rule"));
+  });
+  await assert.rejects(compileSearchDesignSystem({
+    ...sources, "inputs.css": 'input { background:url(https://example.org/private.svg) }',
+  }), /Unreviewed CSS asset/);
+});
+
+test("vendored inputs match their recorded checksums and consumed search tokens exist", async () => {
+  const base = new URL("../Search%20_%20NTG%20Central_files/", import.meta.url);
+  const manifest = JSON.parse(await readFile(new URL("vendor/ntg-design-system/manifest.json", base), "utf8"));
+  const sources = await designSystemSources();
+  for (const [file, contents] of Object.entries(sources))
+    assert.equal(createHash("sha256").update(contents).digest("hex"), manifest.files[file], file);
+  const tokens = new Set();
+  postcss.parse(sources["central.scoped.tokens.css"]).walkDecls((declaration) => tokens.add(declaration.prop));
+  const localCss = await readFile(new URL("search-results.css", base), "utf8");
+  assert.ok(!/--local-(ink|body|green|border)|#[\da-f]{3,8}\b|\bRoboto\b/i.test(localCss));
+  postcss.parse(localCss).walkDecls((declaration) => {
+    for (const [, token] of declaration.value.matchAll(/var\((--[\w-]+)/g))
+      assert.ok(token === "--local-filter-top" || tokens.has(token), `Missing token: ${token}`);
+  });
 });
 
 test("local development uses the same Pro kit without Free font overrides", () => {
