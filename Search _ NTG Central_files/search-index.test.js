@@ -8,6 +8,7 @@ import {
   validateIndex,
   matchRecords,
   searchIndex,
+  searchIndexWithCorrection,
   suggestCorrection,
   suggestRelatedTerms,
   types,
@@ -119,6 +120,37 @@ test("pagination is ten items and clamps invalid pages", () => {
   assert.equal(last.records.length, 3);
   assert.equal(searchIndex(records, { query: "leave", page: -1 }).page, 1);
 });
+test("related partial matches fill a short first page after exact matches", () => {
+  const records = [
+    {
+      ...fixture[0],
+      id: "leave-policy",
+      label: "Leave policy",
+      description: "Policy for leave.",
+    },
+    ...Array.from({ length: 10 }, (_, index) => ({
+      ...fixture[0],
+      id: `leave-guide-${index}`,
+      label: `Leave guide ${index}`,
+      description: "Employee resources and guidance.",
+    })),
+    {
+      ...fixture[1],
+      id: "leave-guidance-policy",
+      label: "Leave guidance",
+      description: "Information about workplace policy.",
+    },
+  ];
+  const result = searchIndex(records, { query: "leave policy" });
+  assert.equal(result.records.length, 10);
+  assert.equal(result.total, 12);
+  assert.equal(result.records[0].id, "leave-policy");
+  assert.equal(
+    searchIndex(records, { query: "leave policy", type: "Information" })
+      .typeCounts.Policy,
+    1,
+  );
+});
 test("conservative correction and safe destinations", () => {
   assert.equal(suggestCorrection(fixture, "leavve"), "leave");
   assert.equal(suggestCorrection(fixture, "ap"), null);
@@ -126,7 +158,22 @@ test("conservative correction and safe destinations", () => {
   assert.equal(safeUrl("javascript:alert(1)"), null);
   assert.equal(safeUrl("https://example.org/"), "https://example.org/");
 });
-test("related terms use relevant records, include indexed keywords, and cap at three", () => {
+test("empty misspelled searches return results for the suggested word", () => {
+  const result = searchIndexWithCorrection(fixture, {
+    query: "leavve",
+    page: 1,
+  });
+  assert.equal(result.query, "leave");
+  assert.ok(result.total > 0);
+  assert.deepEqual(
+    result.records.map((record) => record.id),
+    searchIndex(fixture, { query: "leave", page: 1 }).records.map(
+      (record) => record.id,
+    ),
+  );
+  assert.equal(searchIndexWithCorrection(fixture, { query: "zzzz" }).total, 0);
+});
+test("Did you mean only suggests spelling corrections for unmatched queries", () => {
   const records = [
     {
       ...fixture[0],
@@ -146,36 +193,23 @@ test("related terms use relevant records, include indexed keywords, and cap at t
       description: "Apply for approval.",
     },
   ];
-  const suggestions = suggestRelatedTerms(records, "apply");
-  assert.equal(suggestions.length, 3);
-  assert.equal(new Set(suggestions.map(normalize)).size, suggestions.length);
-  assert.deepEqual(suggestions, [
-    "Apply for leave",
-    "Leave request",
-    "Apply for study",
-  ]);
-  assert.ok(suggestRelatedTerms([records[0]], "leave").includes("annual"));
-  assert.deepEqual(
-    suggestRelatedTerms(
-      [
-        {
-          ...fixture[0],
-          label: "Corporate Directory",
-          keywords: "corporate directory data sources",
-        },
-      ],
-      "Corporate Directory",
-    ),
-    ["data", "sources"],
-  );
-  assert.deepEqual(suggestRelatedTerms(fixture, "leavve").slice(0, 1), [
-    "Leave support",
-  ]);
-  assert.deepEqual(suggestRelatedTerms(fixture, "leavve xyz"), [
-    "Apply for leave",
-  ]);
+  assert.deepEqual(suggestRelatedTerms(records, "apply"), []);
+  assert.deepEqual(suggestRelatedTerms(records, "leavve"), ["leave"]);
+  assert.deepEqual(suggestRelatedTerms(fixture, "leavve xyz"), []);
   assert.deepEqual(suggestRelatedTerms(fixture, "leavve unrelated terms"), []);
   assert.deepEqual(suggestRelatedTerms(fixture, "zzzz"), []);
+});
+test("Did you mean supports phonetic matches", () => {
+  const records = [
+    {
+      ...fixture[0],
+      id: "night-shift",
+      label: "Night shift",
+      description: "Information about working night shifts.",
+    },
+  ];
+  assert.equal(suggestCorrection(records, "nite"), "night");
+  assert.deepEqual(suggestRelatedTerms(records, "nite"), ["night"]);
 });
 test("aliases support matching and spelling corrections", () => {
   const secured = {
