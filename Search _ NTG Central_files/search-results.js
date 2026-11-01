@@ -3,7 +3,7 @@ import {
   normalize,
   initialQuery,
   safeUrl,
-  searchIndex,
+  searchIndexWithCorrection,
   suggestRelatedTerms,
   types,
   categories,
@@ -141,7 +141,13 @@ function highlight(text) {
   return node;
 }
 
-function destination(text, url, recordId, className = "") {
+function destination(
+  text,
+  url,
+  recordId,
+  className = "",
+  showExternalIcon = true,
+) {
   const href = safeUrl(url);
   if (!href)
     return button(text, "record", recordId, className || "local-text-button");
@@ -150,13 +156,88 @@ function destination(text, url, recordId, className = "") {
   if (href.startsWith("https:")) {
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    link.append(
-      document.createTextNode(" "),
-      icon("fa-arrow-up-right-from-square"),
-    );
+    if (showExternalIcon)
+      link.append(
+        document.createTextNode(" "),
+        icon("fa-arrow-up-right-from-square"),
+      );
     link.setAttribute("aria-label", `${text} (opens in a new tab)`);
   }
   return link;
+}
+
+const demoBusinessUnits = [
+  "Corporate Services",
+  "Workforce Services",
+  "Digital Services",
+  "ICT Services",
+  "Finance Services",
+  "People and Culture",
+  "Service Delivery",
+  "Policy and Governance",
+];
+
+const demoContactLocations = [
+  "Chung Wah Terrace, Palmerston",
+  "Henry Wrigley Drive, Marrara",
+  "Willeroo Street, Tiwi",
+  "O'Sullivan Circuit, East Arm",
+  "Delamere Street, Tiwi",
+  "Grevillea Drive, Sadadeen",
+  "Bonson Terrace, Moulden",
+  "Cox Peninsula Road, Berry Springs",
+  "Gregory Terrace, Alice Springs",
+  "Matthew Flinders Way, Darwin",
+  "Newland Street, Gillen",
+  "Ross Smith Avenue, Parap",
+  "Flynn Circuit, Bellamack",
+  "Scaturchio Street, Casuarina",
+  "Katherine Terrace, Katherine",
+  "Cook Street, Farrar",
+  "Knuckey Street, Darwin",
+  "Mitchell Street, Darwin",
+  "Parke Crescent, The Gap",
+  "Bennett Street, Darwin",
+  "Parap Road, Parap",
+  "Paterson Street, Tennant Creek",
+  "Cavenagh Street, Darwin",
+  "Forrest Parade, Rosebery",
+  "Second Street, Katherine",
+  "Sattler Crescent, Freds Pass",
+  "Albrecht Drive, Larapinta",
+  "Victoria Drive, Gray",
+  "Willard Road, Holtze",
+  "Bath Street, Alice Springs",
+  "Woods Street, Darwin",
+  "Stuart Highway, Winnellie",
+];
+
+function demoContactHash(value) {
+  let hash = 0;
+  for (const character of value) hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+  return hash;
+}
+
+function demoDepartment(owner = "") {
+  if (/corporate and digital development/i.test(owner))
+    return "Department of Corporate and Digital Development";
+  if (/education and training/i.test(owner))
+    return "Department of Education and Training";
+  if (/health/i.test(owner)) return "Department of Health";
+  if (/treasury and finance/i.test(owner))
+    return "Department of Treasury and Finance";
+  if (/police, fire and emergency services/i.test(owner))
+    return "Department of Police, Fire and Emergency Services";
+  if (/lands, planning and environment/i.test(owner))
+    return "Department of Lands, Planning and Environment";
+  return "Department of Corporate and Digital Development";
+}
+
+function demoContactLocation(recordId) {
+  const hash = demoContactHash(recordId);
+  const number = (hash % 98) + 1;
+  const street = demoContactLocations[hash % demoContactLocations.length];
+  return `${number} ${street}`;
 }
 
 function renderRecord(record) {
@@ -169,14 +250,30 @@ function renderRecord(record) {
   article.dataset.recordId = record.id;
   const title = element("h3");
   title.append(
-    destination(record.label, record.url, record.id, "local-result-title"),
+    destination(
+      record.label,
+      record.url,
+      record.id,
+      "local-result-title",
+      false,
+    ),
   );
   article.append(title);
   if (record.type === "Contact") {
+    const phoneNumber = "08 8999 1234";
+    const phoneExtension = "91234";
     const contact = element("div", "local-contact");
     const details = element("div", "local-contact-details");
     if (record.role) details.append(element("p", "", record.role));
-    if (record.owner) details.append(element("p", "", record.owner));
+    details.append(
+      element(
+        "p",
+        "local-contact-business-unit",
+        demoBusinessUnits[demoContactHash(record.id) % demoBusinessUnits.length],
+      ),
+      element("p", "local-contact-department", demoDepartment(record.owner)),
+      element("p", "local-contact-location", demoContactLocation(record.id)),
+    );
     const actions = element("div", "local-contact-methods");
     if (record.email)
       actions.append(
@@ -187,23 +284,18 @@ function renderRecord(record) {
           "local-contact-link",
         ),
       );
-    if (record.phone || record.extension) {
-      const phone = element("div", "local-contact-phone");
-      if (record.phone)
-        phone.append(
-          destination(
-            record.phone,
-            `tel:${record.phone}`,
-            record.id,
-            "local-contact-link",
-          ),
-        );
-      if (record.extension) {
-        phone.append(element("span", "local-contact-extension-label", "ext."));
-        phone.append(element("span", "local-contact-link", record.extension));
-      }
-      actions.append(phone);
-    }
+    const phone = element("div", "local-contact-phone");
+    phone.append(
+      destination(
+        phoneNumber,
+        `tel:${phoneNumber}`,
+        record.id,
+        "local-contact-link",
+      ),
+      element("span", "local-contact-extension-label", "ext."),
+      element("span", "local-contact-link", phoneExtension),
+    );
+    actions.append(phone);
     contact.append(details, actions);
     article.append(contact);
   } else {
@@ -229,6 +321,8 @@ function renderRecord(record) {
           `${record.url ? "Open" : "View"} ${record.label}`,
           record.url,
           record.id,
+          "",
+          false,
         ),
       );
       const onlineSystem = record.type === "Online system";
@@ -242,7 +336,9 @@ function renderRecord(record) {
       const supportUrl = onlineSystem
         ? "https://jira.nt.gov.au"
         : `mailto:${email}`;
-      actions.append(destination(supportLabel, supportUrl, record.id));
+      actions.append(
+        destination(supportLabel, supportUrl, record.id, "", false),
+      );
       if (demoEmail && !onlineSystem)
         actions.append(
           element(
@@ -421,7 +517,10 @@ root.after(filterDialog);
 function positionMobileFilters() {
   const band = document.querySelector(".header-wrapper--main");
   const bottom = band?.getBoundingClientRect().bottom || 0;
-  filterDialog.style.setProperty("--local-filter-top", `${Math.max(0, bottom)}px`);
+  filterDialog.style.setProperty(
+    "--local-filter-top",
+    `${Math.max(0, bottom)}px`,
+  );
 }
 
 function refreshMobileFilters(rebuild = false) {
@@ -429,27 +528,45 @@ function refreshMobileFilters(rebuild = false) {
   if (rebuild) {
     const activeId = document.activeElement?.id;
     const scrollTop = filterBody.scrollTop;
-    const ownerScroll = filterBody.querySelector(".local-owner-options")?.scrollTop;
+    const ownerScroll = filterBody.querySelector(
+      ".local-owner-options",
+    )?.scrollTop;
     filterBody.replaceChildren(renderFilters(result, draft, "mobile"));
-    if (activeId) filterBody.querySelector(`[id="${activeId}"]`)?.focus({ preventScroll: true });
+    if (activeId)
+      filterBody
+        .querySelector(`[id="${activeId}"]`)
+        ?.focus({ preventScroll: true });
     filterBody.scrollTop = scrollTop;
-    if (ownerScroll) filterBody.querySelector(".local-owner-options").scrollTop = ownerScroll;
+    if (ownerScroll)
+      filterBody.querySelector(".local-owner-options").scrollTop = ownerScroll;
   }
-  filterBody.querySelectorAll('input[name="mobile-category"], input[name="mobile-owner"]').forEach((control) => {
-    const category = control.name === "mobile-category";
-    control.checked = draft[category ? "categories" : "owners"].includes(control.value);
-    control.nextElementSibling.textContent = `${control.value} (${(category ? result.categoryCounts : result.ownerCounts)[control.value]})`;
-  });
-  filterBody.querySelectorAll('input[name="mobile-sort"]').forEach((control) => {
-    control.checked = control.value === draft.sort;
-  });
+  filterBody
+    .querySelectorAll(
+      'input[name="mobile-category"], input[name="mobile-owner"]',
+    )
+    .forEach((control) => {
+      const category = control.name === "mobile-category";
+      control.checked = draft[category ? "categories" : "owners"].includes(
+        control.value,
+      );
+      control.nextElementSibling.textContent = `${control.value} (${(category ? result.categoryCounts : result.ownerCounts)[control.value]})`;
+    });
+  filterBody
+    .querySelectorAll('input[name="mobile-sort"]')
+    .forEach((control) => {
+      control.checked = control.value === draft.sort;
+    });
   const trigger = filterBody.querySelector(".local-owner-trigger");
   trigger.firstChild.textContent = `Selected (${draft.owners.length})`;
   filterCount.textContent = `Show ${result.total} ${result.total === 1 ? "result" : "results"}`;
 }
 
 function openMobileFilters() {
-  draft = { ...state, categories: [...state.categories], owners: [...state.owners] };
+  draft = {
+    ...state,
+    categories: [...state.categories],
+    owners: [...state.owners],
+  };
   ownersOpen = false;
   savedOverflow = document.documentElement.style.overflow;
   savedScroll = window.scrollY;
@@ -556,7 +673,7 @@ function renderResults(focus = false) {
   const activeId = root.contains(document.activeElement)
     ? document.activeElement.id
     : "";
-  const result = searchIndex(records, state);
+  const result = searchIndexWithCorrection(records, state);
   state.page = result.page;
   const inner = element("div", "local-search-inner");
   const query = element("div", "local-query");
@@ -577,7 +694,7 @@ function renderResults(focus = false) {
   query.append(
     heading(
       result.total
-        ? `Showing ${range} for "${state.query}"`
+        ? `Showing ${range} for "${result.query}"`
         : `Showing results for "${state.query}"`,
     ),
   );
@@ -612,7 +729,11 @@ function renderResults(focus = false) {
   const filterTrigger = button("", "filters", "", "local-filter-trigger");
   filterTrigger.id = "local-open-filters";
   filterTrigger.setAttribute("aria-haspopup", "dialog");
-  filterTrigger.append(icon("fa-sliders-up", "fal"), element("span", "", "Filter and sort"), icon("fa-chevron-right", "fal"));
+  filterTrigger.append(
+    icon("fa-sliders-up", "fal"),
+    element("span", "", "Filter and sort"),
+    icon("fa-chevron-right", "fal"),
+  );
   const typeSelectWrap = element("div", "local-type-select-wrap");
   typeSelectWrap.append(typeSelect, icon("fa-chevron-down", "fal"));
   mobileControls.append(typeLabel, typeSelectWrap, filterTrigger);

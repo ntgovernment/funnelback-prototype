@@ -41,7 +41,29 @@ if (form && input && list && status) {
       option.id = `search-option-${suggestion.id}`;
       option.setAttribute('role', 'option');
       option.setAttribute('aria-selected', 'false');
-      option.textContent = suggestion.label;
+      const icon = document.createElement('span');
+      icon.className = 'fal fa-search';
+      icon.setAttribute('aria-hidden', 'true');
+      option.append(icon);
+
+      const label = document.createElement('span');
+      label.className = 'ntgc-search-suggestion-label';
+      const queryTerms = normalize(query).split(' ').filter(Boolean);
+      let labelPosition = 0;
+      for (const word of suggestion.label.matchAll(/[a-z0-9]+/gi)) {
+        label.append(document.createTextNode(suggestion.label.slice(labelPosition, word.index)));
+        const text = word[0];
+        if (queryTerms.some((term) => normalize(text).startsWith(term))) {
+          const highlighted = document.createElement('strong');
+          highlighted.textContent = text;
+          label.append(highlighted);
+        } else {
+          label.append(document.createTextNode(text));
+        }
+        labelPosition = word.index + text.length;
+      }
+      label.append(document.createTextNode(suggestion.label.slice(labelPosition)));
+      option.append(label);
       list.append(option);
     }
 

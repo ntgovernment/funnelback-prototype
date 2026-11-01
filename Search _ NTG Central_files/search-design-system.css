@@ -1,5 +1,5 @@
 /* Generated from pinned NTG source by scripts/build-search-design-system.js. */
-:is(.ntgc-local-search, .local-record-dialog), :is(.ntgc-local-search, .local-record-dialog)::backdrop {
+:is(.ntgc-local-search, .local-record-dialog), :is(.ntgc-local-search, .local-record-dialog)::backdrop, #ntgc-site-search, form[name="ntgc-search-form"] {
   --border-width-lg: 2px;
   --border-width-md: 1px;
   --border-width-sm: 0.5px;
@@ -237,7 +237,7 @@
 
 @media screen and (max-width: 768px) {
 
-  :is(.ntgc-local-search, .local-record-dialog), :is(.ntgc-local-search, .local-record-dialog)::backdrop {
+  :is(.ntgc-local-search, .local-record-dialog), :is(.ntgc-local-search, .local-record-dialog)::backdrop, #ntgc-site-search, form[name="ntgc-search-form"] {
   --type-body-default-font-family: var(--type-font-family-default);
   --type-body-default-font-size: var(--type-desktop-body-default-size);
   --type-body-default-font-weight: var(--type-desktop-body-default-weight);

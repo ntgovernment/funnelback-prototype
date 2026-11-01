@@ -120,8 +120,19 @@ function words(value) {
 }
 
 export function matchRecords(records, query) {
+  return rankRecords(records, query).filter(({ coverage }) => coverage === words(query).length)
+    .map(({ record, score, position }) => ({ record, score, position }));
+}
+
+const fallbackStopWords = new Set(["a", "an", "and", "for", "in", "of", "the", "to", "with"]);
+
+function rankRecords(records, query, partial = false) {
   const tokens = words(query);
   if (!tokens.length) return [];
+  const relevantTokens = partial
+    ? tokens.filter((token) => !fallbackStopWords.has(token))
+    : tokens;
+  const searchTokens = relevantTokens.length ? relevantTokens : tokens;
   return records.flatMap((record, position) => {
     const title = normalize(record.label);
     const titleWords = words(record.label);
@@ -138,15 +149,14 @@ export function matchRecords(records, query) {
       ].join(" "),
     );
     const allWords = [...titleWords, ...metadata];
-    if (
-      !tokens.every((token, index) =>
-        allWords.some(
-          (word) =>
-            word === token ||
-            (index === tokens.length - 1 && word.startsWith(token)),
-        ),
-      )
-    )
+    const coverage = searchTokens.filter((token, index) =>
+      allWords.some(
+        (word) =>
+          word === token ||
+          (index === searchTokens.length - 1 && word.startsWith(token)),
+      ),
+    ).length;
+    if (partial ? !coverage : coverage !== tokens.length)
       return [];
     const score =
       (title === normalize(query) ? 100 : 0) +
@@ -156,7 +166,7 @@ export function matchRecords(records, query) {
         titleWords.some((word) => word.startsWith(token)),
       ).length *
         10;
-    return [{ record, score, position }];
+    return [{ record, score, position, coverage }];
   });
 }
 
@@ -175,7 +185,24 @@ function within(record, state, except) {
 }
 
 export function searchIndex(records, state) {
-  const matches = matchRecords(records, state.query);
+  const strictMatches = rankRecords(records, state.query);
+  const strictFiltered = strictMatches.filter(({ record }) => within(record, state));
+  const fallbackMatches =
+    strictFiltered.length < pageSize
+      ? rankRecords(records, state.query, true)
+          .filter(
+            ({ record }) =>
+              !strictMatches.some((match) => match.record.id === record.id),
+          )
+          .sort(
+            (first, second) =>
+              second.coverage - first.coverage ||
+              second.score - first.score ||
+              first.position - second.position,
+          )
+          .map((match) => ({ ...match, fallback: true }))
+      : [];
+  const matches = [...strictMatches, ...fallbackMatches];
   const typeCounts = Object.fromEntries(
     types.map((type) => [
       type,
@@ -206,6 +233,14 @@ export function searchIndex(records, state) {
   );
   const filtered = matches.filter(({ record }) => within(record, state));
   filtered.sort((first, second) => {
+    if (Boolean(first.fallback) !== Boolean(second.fallback))
+      return first.fallback ? 1 : -1;
+    if (first.fallback)
+      return (
+        second.coverage - first.coverage ||
+        second.score - first.score ||
+        first.position - second.position
+      );
     if (state.sort === "updated")
       return (
         (second.record.updated || "").localeCompare(
@@ -240,6 +275,19 @@ export function searchIndex(records, state) {
   };
 }
 
+export function searchIndexWithCorrection(records, state) {
+  const result = searchIndex(records, state);
+  if (result.total) return { ...result, query: state.query };
+
+  const correction = suggestCorrection(records, state.query);
+  if (!correction) return { ...result, query: state.query };
+
+  const correctedResult = searchIndex(records, { ...state, query: correction });
+  return correctedResult.total
+    ? { ...correctedResult, query: correction }
+    : { ...result, query: state.query };
+}
+
 function distance(first, second) {
   let row = Array.from({ length: second.length + 1 }, (_, index) => index);
   for (const [index, letter] of [...first].entries()) {
@@ -256,43 +304,21 @@ function distance(first, second) {
   return row[second.length];
 }
 
-function closestRecord(records, query) {
-  const tokens = words(query).filter((token) => token.length >= 4);
-  if (!tokens.length) return null;
-  const ranked = records
-    .map((record, position) => {
-      const recordWords = words(
-        [record.label, ...(record.aliases || []), record.keywords || ""].join(
-          " ",
-        ),
-      );
-      let matched = 0;
-      let exact = 0;
-      let totalDistance = 0;
-      for (const token of tokens) {
-        const nearest = Math.min(
-          ...recordWords.map((word) => distance(token, word)),
-        );
-        const threshold = token.length >= 7 ? 2 : 1;
-        if (nearest <= threshold) {
-          matched += 1;
-          if (nearest === 0) exact += 1;
-        }
-        totalDistance += nearest;
-      }
-      return { record, position, matched, exact, totalDistance };
-    })
-    .sort(
-      (first, second) =>
-        second.matched - first.matched ||
-        second.exact - first.exact ||
-        first.totalDistance - second.totalDistance ||
-        first.position - second.position,
-    );
-  const closest = ranked[0];
-  return closest && closest.matched >= Math.ceil(tokens.length / 2)
-    ? closest.record
-    : null;
+function phoneticKey(word) {
+  const normalized = word
+    .toLowerCase()
+    .replace(/^kn/, "n")
+    .replace(/^wr/, "r")
+    .replace(/ph/g, "f")
+    .replace(/ght/g, "t")
+    .replace(/ck/g, "k")
+    .replace(/qu/g, "kw")
+    .replace(/c(?=[eiy])/g, "s")
+    .replace(/c/g, "k")
+    .replace(/x/g, "ks")
+    .replace(/([^aeiou])\1+/g, "$1")
+    .replace(/e$/, "");
+  return normalized[0] + normalized.slice(1).replace(/[aeiou]/g, "");
 }
 
 export function suggestCorrection(records, query) {
@@ -312,14 +338,26 @@ export function suggestCorrection(records, query) {
       if (token.length < 4 || dictionary.some((word) => word.startsWith(token)))
         return token;
       const candidates = dictionary
-        .map((word) => ({ word, distance: distance(token, word) }))
+        .map((word) => ({
+          word,
+          distance: distance(token, word),
+          soundsLike: phoneticKey(token) === phoneticKey(word),
+        }))
         .filter(
-          (candidate) => candidate.distance <= (token.length >= 7 ? 2 : 1),
+          (candidate) =>
+            candidate.distance <= (token.length >= 7 ? 2 : 1) ||
+            candidate.soundsLike,
         )
-        .sort((first, second) => first.distance - second.distance);
+        .sort(
+          (first, second) =>
+            first.distance - second.distance ||
+            Number(second.soundsLike) - Number(first.soundsLike),
+        );
       if (
         !candidates.length ||
-        (candidates[1] && candidates[1].distance === candidates[0].distance)
+        (candidates[1] &&
+          candidates[1].distance === candidates[0].distance &&
+          candidates[1].soundsLike === candidates[0].soundsLike)
       )
         return token;
       changed = true;
@@ -330,46 +368,7 @@ export function suggestCorrection(records, query) {
 }
 
 export function suggestRelatedTerms(records, query) {
-  let matches = matchRecords(records, query);
-  if (!matches.length) {
-    const correction = suggestCorrection(records, query);
-    if (correction) {
-      matches = matchRecords(records, correction);
-    } else {
-      const closest = closestRecord(records, query);
-      return closest ? [closest.label] : [];
-    }
-  }
-
-  const seen = new Set([normalize(query)]);
-  const queryWords = new Set(words(query));
-  const suggestions = [];
-  matches.sort(
-    (first, second) =>
-      second.score - first.score || first.position - second.position,
-  );
-  const candidates = [
-    ...matches.flatMap(({ record }) => [
-      record.label,
-      ...(record.aliases || []),
-    ]),
-    ...matches.flatMap(({ record }) =>
-      words(record.keywords || "").filter((word) => word.length >= 4),
-    ),
-  ];
-  for (const candidate of candidates) {
-    const normalized = normalize(candidate);
-    const candidateWords = words(candidate);
-    if (
-      !normalized ||
-      seen.has(normalized) ||
-      candidateWords.every((word) => queryWords.has(word)) ||
-      !matchRecords(records, candidate).length
-    )
-      continue;
-    seen.add(normalized);
-    suggestions.push(candidate.trim());
-    if (suggestions.length === 3) return suggestions;
-  }
-  return suggestions;
+  if (matchRecords(records, query).length) return [];
+  const correction = suggestCorrection(records, query);
+  return correction ? [correction] : [];
 }
