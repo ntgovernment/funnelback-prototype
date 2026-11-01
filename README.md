@@ -132,6 +132,8 @@ The main menu stays beside the logo and search whenever the complete header row 
 
 Hovering main-menu and Quick links items underlines the link label only; it does not change link color or background, and dropdown icons remain undecorated.
 
+Inline main-menu dropdowns match and center on the header content row, up to 1232px wide and shrinking with the row's 32px side gutters on narrower screens. Submenu labels wrap within their columns so long titles remain readable without overflowing the dropdown.
+
 The mobile panel includes Back controls for returning from submenus. The menu button supports Enter and Space, exposes `aria-controls` and `aria-expanded`, and closes on Escape or outside clicks. Switching between inline and mobile layouts closes open navigation and resets submenu state. Focus moves to visible controls when needed. The utility dropdown also closes on outside click and Escape and keeps its `aria-expanded` state synchronized.
 
 The utility-row Online systems button opens an All online systems submenu. The base stylesheet gives both the utility and main header sections a `z-index` of `10000`; the later main section can cover the open submenu. A narrowly scoped override in [header-compact.css](Search%20_%20NTG%20Central_files/header-compact.css) raises the utility section to `10001`. Keep this override on the utility section: increasing only the submenu's `z-index` cannot escape its parent's stacking context. The mobile utility-row hiding and Quick links behavior are unchanged.

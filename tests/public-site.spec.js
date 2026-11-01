@@ -44,6 +44,17 @@ for (const width of [390, 900, 1440]) {
     const mainLink = navigation.locator("ul.level-one > li:visible > a").first();
     await assertUnderlineOnly(mainLink);
     await mainLink.click();
+    await expect(mainLink.locator("..")).toHaveClass(/active/);
+    if (width === 1440) {
+      const dropdown = mainLink.locator("..").locator(".menu-wrapper");
+      const row = page.locator(".ntgc-header__inner--main > .row");
+      const rowBounds = await row.boundingBox();
+      const dropdownBounds = await dropdown.boundingBox();
+      expect(dropdownBounds.width).toBe(rowBounds.width);
+      expect(Math.abs((dropdownBounds.x + dropdownBounds.width / 2) - (rowBounds.x + rowBounds.width / 2))).toBeLessThan(1);
+      await expect(dropdown.getByRole("link", { name: "Training and career development" })).toHaveCSS("white-space", "normal");
+      await expect(dropdown.getByRole("link", { name: "Training and career development" })).toHaveCSS("overflow-wrap", "anywhere");
+    }
     if (!mobileMenu) await assertUnderlineOnly(mainLink);
     await assertUnderlineOnly(navigation.locator("ul.level-two > li > a:visible").first());
   });
