@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(fileURLToPath(new URL("../dist/", import.meta.url)));
 const prefix = "/funnelback-prototype/";
+const port = Number(process.env.PUBLIC_PORT || 4175);
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -37,6 +38,6 @@ const server = createServer(async (request, response) => {
     response.end("Not found");
   }
 });
-server.listen(4175, "127.0.0.1", () =>
-  console.log(`Public artifact: http://127.0.0.1:4175${prefix}`),
+server.listen(port, "127.0.0.1", () =>
+  console.log(`Public artifact: http://127.0.0.1:${port}${prefix}`),
 );

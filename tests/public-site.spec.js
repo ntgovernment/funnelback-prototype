@@ -43,6 +43,8 @@ for (const width of [390, 900, 1440]) {
     const navigation = page.locator(".ntgc-navigation--main:visible");
     const mainLink = navigation.locator("ul.level-one > li:visible > a").first();
     await assertUnderlineOnly(mainLink);
+    const originalBackground = await mainLink.evaluate((node) => getComputedStyle(node).backgroundColor);
+    if (width === 1440) expect(mobileMenu).toBe(false);
     await mainLink.click();
     await expect(mainLink.locator("..")).toHaveClass(/active/);
     if (width === 1440) {
@@ -55,7 +57,13 @@ for (const width of [390, 900, 1440]) {
       await expect(dropdown.getByRole("link", { name: "Training and career development" })).toHaveCSS("white-space", "normal");
       await expect(dropdown.getByRole("link", { name: "Training and career development" })).toHaveCSS("overflow-wrap", "anywhere");
     }
-    if (!mobileMenu) await assertUnderlineOnly(mainLink);
+    if (!mobileMenu) {
+      await expect(mainLink).toHaveCSS("background-color", originalBackground);
+      await page.mouse.move(0, 899);
+      await expect(mainLink).toHaveCSS("background-color", originalBackground);
+      await assertUnderlineOnly(mainLink);
+      await expect(mainLink).toHaveCSS("background-color", originalBackground);
+    }
     await assertUnderlineOnly(navigation.locator("ul.level-two > li > a:visible").first());
   });
 }
@@ -145,12 +153,16 @@ for (const width of [320, 390, 900, 1440]) {
     await page.locator('link[href$="search-design-system.css"]').evaluate((node) => { node.disabled = false; });
     expect(await page.locator("header").first().evaluate((node) => getComputedStyle(node).getPropertyValue("--clr-text-default"))).toBe("");
     if (width < 900) {
+      await expect(page.locator(".local-type-nav")).toBeHidden();
+      await expect(page.locator(".local-type-select")).toBeVisible();
       await page.getByRole("button", { name: "Filter and sort", exact: true }).click();
       const dialog = page.locator(".local-filter-dialog");
       await expect(dialog).toBeVisible();
       await expect(dialog).toHaveCSS("font-family", "Roboto, sans-serif");
       await expect(dialog.getByLabel("A - Z", { exact: true })).toHaveCSS("width", "24px");
     } else {
+      await expect(page.locator(".local-type-nav")).toBeVisible();
+      await expect(page.locator(".local-type-select")).toBeHidden();
       const category = page.locator('.local-category-group input[type="checkbox"]').first();
       await category.check();
       await expect(page.locator('.local-category-group input[type="checkbox"]').first()).toBeChecked();
@@ -161,6 +173,235 @@ for (const width of [320, 390, 900, 1440]) {
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
     await page.screenshot({ path: testInfo.outputPath(`central-${width}.png`), fullPage: width >= 900, animations: "disabled" });
+  });
+}
+
+async function hoverShade(control, token = "--clr-bg-shade") {
+  return control.evaluate((node, name) => {
+    const probe = document.createElement("span");
+    probe.style.color = `var(${name})`;
+    node.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  }, token);
+}
+
+for (const width of [390, 900, 1440]) {
+  test(`main nav search hover matches the page search at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("./");
+    await page.evaluate(() => document.fonts.ready);
+    const form = page.locator('form[name="ntgc-search-form"]');
+    const input = form.locator("#searchterm");
+    const submit = form.locator(".ntgc-search__submit");
+    if (width < 1296) await submit.click();
+    await expect(input).toBeVisible();
+    await page.locator(".ntgc-header__search").evaluate(async (node) => {
+      await Promise.all(node.getAnimations({ subtree: true }).map((animation) => animation.finished));
+    });
+    await page.mouse.move(0, 899);
+    const bounds = await input.boundingBox();
+    const shade = await hoverShade(form, "--clr-bg-shade-alt");
+    const original = await input.evaluate((node) => {
+      const style = getComputedStyle(node);
+      return { radius: style.borderRadius, color: style.color };
+    });
+    const buttonBackground = await submit.evaluate((node) => getComputedStyle(node).backgroundColor);
+    await expect(input).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    for (const control of [input, submit]) {
+      await control.hover();
+      await expect(input).toHaveCSS("background-color", shade);
+      await expect(input).toHaveCSS("border-radius", original.radius);
+      await expect(input).toHaveCSS("color", original.color);
+      await expect(submit).toHaveCSS("background-color", buttonBackground);
+      expect(await input.boundingBox()).toEqual(bounds);
+      await page.mouse.move(0, 899);
+      await expect(input).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    }
+    await input.focus();
+    const outline = await input.evaluate((node) => getComputedStyle(node).outline);
+    await input.hover();
+    await expect(input).toHaveCSS("outline", outline);
+    await page.screenshot({ path: testInfo.outputPath(`main-nav-search-hover-${width}.png`), animations: "disabled" });
+  });
+}
+
+for (const width of [390, 1440]) {
+  test(`search hover joins both segments without changing focus at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("./");
+    await page.evaluate(() => document.fonts.ready);
+    const input = page.locator("#search");
+    const submit = page.locator("#ntgc-site-search .ntgc-search__submit");
+    const shade = await hoverShade(page.locator("#ntgc-site-search"), "--clr-bg-shade-alt");
+    await page.mouse.move(0, 899);
+    const bounds = await input.boundingBox();
+    for (const control of [input, submit]) {
+      await expect(control).toHaveCSS("background-color", "rgb(255, 255, 255)");
+      await control.hover();
+      for (const segment of [input, submit]) {
+        await expect(segment).toHaveCSS("background-color", shade);
+        await expect(segment).toHaveCSS("color", "rgb(16, 32, 64)");
+      }
+      expect(await input.boundingBox()).toEqual(bounds);
+      await page.mouse.move(0, 899);
+    }
+    await input.focus();
+    await input.hover();
+    await expect(input).toHaveCSS("outline-width", "3px");
+    await expect(input).toHaveCSS("outline-color", "rgb(32, 136, 32)");
+    await page.screenshot({ path: testInfo.outputPath(`search-hover-${width}.png`), animations: "disabled" });
+    await input.fill("Apply f");
+    await page.locator('#search-suggestions [role="option"]').first().hover();
+    for (const segment of [input, submit]) await expect(segment).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    expect(await page.locator("header, footer").evaluateAll((nodes) => nodes.every((node) => !getComputedStyle(node).getPropertyValue("--clr-bg-shade")))).toBe(true);
+  });
+
+  test(`owner hover preserves open and checked states at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("./?searchterm=apply");
+    if (width < 900) await page.getByRole("button", { name: "Filter and sort", exact: true }).click();
+    const owner = page.locator(".local-owner-trigger:visible");
+    await owner.scrollIntoViewIfNeeded();
+    await page.mouse.move(0, 899);
+    const bounds = await owner.boundingBox();
+    const original = await owner.evaluate((node) => {
+      const style = getComputedStyle(node);
+      return { border: style.border, color: style.color };
+    });
+    const shade = await hoverShade(owner);
+    await expect(owner).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await owner.hover();
+    await expect(owner).toHaveCSS("background-color", shade);
+    await expect(owner).toHaveCSS("border", original.border);
+    await expect(owner).toHaveCSS("color", original.color);
+    expect(await owner.boundingBox()).toEqual(bounds);
+    await owner.focus();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Shift+Tab");
+    await expect(owner).toBeFocused();
+    await page.mouse.move(0, 899);
+    const focusOutline = await owner.evaluate((node) => getComputedStyle(node).outline);
+    await expect(owner).toHaveCSS("outline-style", "solid");
+    await owner.hover();
+    await expect(owner).toHaveCSS("outline", focusOutline);
+    await owner.click();
+    await expect(owner).toHaveAttribute("aria-expanded", "true");
+    await page.mouse.move(0, 899);
+    const openOutline = await owner.evaluate((node) => getComputedStyle(node).outline);
+    await owner.hover();
+    await expect(owner).toHaveCSS("background-color", shade);
+    await expect(owner).toHaveCSS("outline", openOutline);
+    const checkbox = page.locator('.local-owner-options:visible input[type="checkbox"]').first();
+    await checkbox.check();
+    await checkbox.locator("..").hover();
+    await expect(checkbox).toBeChecked();
+    const checkedBackground = await checkbox.evaluate((node) => getComputedStyle(node).backgroundColor);
+    await owner.hover();
+    await expect(checkbox).toBeChecked();
+    await expect(checkbox).toHaveCSS("background-color", checkedBackground);
+    await page.screenshot({ path: testInfo.outputPath(`owner-hover-${width}.png`), animations: "disabled" });
+    await page.mouse.move(0, 899);
+    await expect(owner).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  });
+}
+
+test("search hover and owner hover stay inactive on touch devices", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  try {
+    const page = await context.newPage();
+    await page.goto("./?searchterm=apply");
+    expect(await page.evaluate(() => matchMedia("(hover: hover)").matches)).toBe(false);
+    const navSearch = page.locator('form[name="ntgc-search-form"]');
+    await navSearch.locator(".ntgc-search__submit").click();
+    await navSearch.locator("#searchterm").hover();
+    await expect(navSearch.locator("#searchterm")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await page.locator("#search").hover();
+    await expect(page.locator("#search")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(page.locator("#ntgc-site-search .ntgc-search__submit")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await page.getByRole("button", { name: "Filter and sort", exact: true }).click();
+    const owner = page.locator(".local-owner-trigger:visible");
+    await owner.hover();
+    await expect(owner).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  } finally {
+    await context.close();
+  }
+});
+
+for (const width of [900, 1440]) {
+  test(`Search result type buttons match square pill states at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("./?searchterm=apply");
+    const buttons = page.locator(".local-type-button");
+    const selected = buttons.first();
+    const target = buttons.nth(1);
+    await expect(target).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const colors = await target.evaluate((node) => {
+      const style = getComputedStyle(node);
+      return Object.fromEntries(["--clr-bg-default", "--clr-bg-shade-alt", "--clr-link-default", "--clr-border-subtle", "--clr-focus-focus", "--clr-action-pirmary", "--clr-text-inverse"].map((name) => {
+        const probe = document.createElement("span");
+        probe.style.color = style.getPropertyValue(name);
+        node.append(probe);
+        const color = getComputedStyle(probe).color;
+        probe.remove();
+        return [name, color];
+      }));
+    });
+    const assertBorder = async (control) => {
+      await expect(control).toHaveCSS("border-radius", "0px");
+      await expect(control).toHaveCSS("border-top-width", "1px");
+      await expect(control).toHaveCSS("border-top-style", "solid");
+      await expect(control).toHaveCSS("border-top-color", colors["--clr-border-subtle"]);
+    };
+    await page.mouse.move(0, 899);
+    await expect(target).toHaveCSS("background-color", colors["--clr-bg-default"]);
+    await expect(target).toHaveCSS("color", colors["--clr-link-default"]);
+    await expect(target).toHaveCSS("font-family", "Roboto, sans-serif");
+    await expect(target).toHaveCSS("font-size", "16px");
+    await expect(target).toHaveCSS("font-weight", "400");
+    await expect(target).toHaveCSS("line-height", "24px");
+    await expect(target).toHaveCSS("padding", "8px 16px");
+    await expect(target).toHaveCSS("gap", "8px");
+    const icon = target.locator("span").first();
+    await expect(icon).toHaveCSS("width", "12px");
+    await expect(icon).toHaveCSS("height", "12px");
+    await expect(icon).toHaveCSS("font-size", "12px");
+    await assertBorder(target);
+    const originalBounds = await target.boundingBox();
+    await target.hover();
+    await expect(target).toHaveCSS("background-color", colors["--clr-bg-shade-alt"]);
+    await expect(target).toHaveCSS("color", colors["--clr-link-default"]);
+    await assertBorder(target);
+    expect(await target.boundingBox()).toEqual(originalBounds);
+    await page.mouse.move(0, 899);
+    await selected.focus();
+    await page.keyboard.press("Tab");
+    await expect(target).toBeFocused();
+    await expect(target).toHaveCSS("outline-width", "4px");
+    await expect(target).toHaveCSS("outline-style", "solid");
+    await expect(target).toHaveCSS("outline-color", colors["--clr-focus-focus"]);
+    await expect(target).toHaveCSS("outline-offset", "0px");
+    await expect(target).toHaveCSS("background-color", colors["--clr-bg-default"]);
+    await assertBorder(target);
+    expect(await target.boundingBox()).toEqual(originalBounds);
+    await page.screenshot({ path: testInfo.outputPath(`square-pill-focus-${width}.png`), animations: "disabled" });
+    await target.click();
+    await expect(target).toHaveAttribute("aria-pressed", "true");
+    await expect(selected).toHaveAttribute("aria-pressed", "false");
+    await expect(page.locator(".local-type-select")).toHaveValue(await target.getAttribute("data-value"));
+    await target.hover();
+    await expect(target).toHaveCSS("background-color", colors["--clr-action-pirmary"]);
+    await expect(target).toHaveCSS("color", colors["--clr-text-inverse"]);
+    await assertBorder(target);
+    await page.mouse.move(0, 899);
+    await selected.focus();
+    await page.keyboard.press("Tab");
+    await expect(target).toBeFocused();
+    await expect(target).toHaveCSS("outline-color", colors["--clr-focus-focus"]);
+    await expect(target).toHaveCSS("outline-width", "4px");
+    await expect(target).toHaveCSS("background-color", colors["--clr-action-pirmary"]);
   });
 }
 

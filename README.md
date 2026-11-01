@@ -38,6 +38,16 @@ If the terminal uses an HTTP proxy, exclude loopback hosts when running Playwrig
 NO_PROXY=127.0.0.1,localhost no_proxy=127.0.0.1,localhost npm run test:browser
 ```
 
+If port 4175 is occupied, set `PUBLIC_PORT` for both the preview and browser checks. The default remains 4175. For example, in Bash:
+
+```bash
+PUBLIC_PORT=4186 npm run preview:public
+# In another terminal, using the same port:
+NO_PROXY=127.0.0.1,localhost no_proxy=127.0.0.1,localhost PUBLIC_PORT=4186 npm run test:browser
+```
+
+The alternate preview URL is http://127.0.0.1:4186/funnelback-prototype/. Playwright starts a preview when needed or reuses the server at its configured URL.
+
 If a Pages deploy job is queued with no runner assigned, first check [GitHub Status](https://www.githubstatus.com/), pending approvals and the environment's permitted deployment branches. A hosted-runner service incident cannot be fixed by changing the site's assets. The Node deprecation and Ubuntu migration notices alone do not indicate a failed deployment.
 
 ## Workshop Testing
@@ -69,7 +79,7 @@ Logo rendering has also been checked at 390px and 1440px in local and production
 
 ## Search Design-System CSS
 
-Search results, filters and record dialogs use the NTG monorepo's Central tokens and native input styles. Header, navigation, footer and header-search styling are intentionally unchanged. The source is pinned to local `dev` revision `beef32e1e4f901e40ab00f0339dc4aaaa1597524`, with token outputs from submodule revision `d9f7dd9c4304ed91068742fd5d7d7b05b637d713`.
+Search results, filters and record dialogs use the NTG monorepo's Central tokens and native input styles. The page and main-nav search forms also receive Central tokens for their pointer-hover background, `--clr-bg-shade-alt` (`#ecf0f0`), while retaining their existing geometry and focus styles. Other header, navigation and footer styling is unchanged. The source is pinned to local `dev` revision `beef32e1e4f901e40ab00f0339dc4aaaa1597524`, with token outputs from submodule revision `d9f7dd9c4304ed91068742fd5d7d7b05b637d713`.
 
 The unmodified [vendor inputs and provenance](Search%20_%20NTG%20Central_files/vendor/ntg-design-system/manifest.json) contain the Central token CSS, input CSS and attributed Font Awesome check SVG. No Storybook preview CSS or upstream JavaScript is included. This snapshot does not establish a license grant: confirm permission to redistribute NTG component CSS and review the embedded icon's terms before public release.
 
@@ -79,11 +89,15 @@ Regenerate the checked-in [scoped bundle](Search%20_%20NTG%20Central_files/searc
 npm run generate:design-system
 ```
 
-Development and public builds regenerate it automatically. The [generator](scripts/build-search-design-system.js) verifies source checksums, compiles native nesting, scopes tokens and input selectors to `.ntgc-local-search` and `.local-record-dialog` (including backdrop tokens), namespaces the checkbox animation, and embeds the SVG. The selected input module has no imports or custom media to resolve; unexpected imports/assets fail closed. No global resets, theme changes, cascade layers or new external requests are introduced. Existing Roboto files are reused. The upstream spelling `--clr-action-pirmary` is preserved.
+Development and public builds regenerate it automatically. The [generator](scripts/build-search-design-system.js) verifies source checksums, compiles native nesting, scopes tokens and input selectors to `.ntgc-local-search` and `.local-record-dialog` (including backdrop tokens), namespaces the checkbox animation, and embeds the SVG. Tokens, but not native input rules, also apply to `#ntgc-site-search` and `form[name="ntgc-search-form"]`. The selected input module has no imports or custom media to resolve; unexpected imports/assets fail closed. No global resets, theme changes, cascade layers or new external requests are introduced. Existing Roboto files are reused. The upstream spelling `--clr-action-pirmary` is preserved.
 
 The [search stylesheet](Search%20_%20NTG%20Central_files/search-results.css) consumes semantic color, spacing, typography, border, radius, shadow and focus tokens. Product-specific geometry remains local: the 1232px content width, 332px desktop filter column, 534px minimum search-section height and 900px filter breakpoint are preserved. Primitive typography tokens are used because some upstream composite aliases do not resolve. Native checkbox/radio state rules come from the source bundle rather than custom paint rules. Inputs retain upstream hover, focus, checked, disabled, readonly, error and success styling; readonly styling alone does not provide native checkbox/radio readonly semantics.
 
-Edit local presentation in the search stylesheet, not the generated bundle. The generated design-system stylesheet loads before the local search overrides. Its tokens apply to each search/dialog root and its backdrop rather than the document root; do not add a global Central theme to migrate the header or footer implicitly. The checkbox's embedded SVG works without the remote icon kit, but other interface icons still depend on that kit.
+Edit result/filter presentation in the [search stylesheet](Search%20_%20NTG%20Central_files/search-results.css) and search-bar presentation in [header-compact.css](Search%20_%20NTG%20Central_files/header-compact.css), not the generated bundle. The generated design-system stylesheet loads before the local search overrides. Tokens apply to the results/dialog roots and their backdrops, plus the two search forms, rather than the document root; do not add a global Central theme to migrate the header or footer implicitly. Native input rules remain limited to results and dialogs. The checkbox's embedded SVG works without the remote icon kit, but other interface icons still depend on that kit.
+
+Both search bars use `--clr-bg-shade-alt` (`#ecf0f0`) when either their input or search button is hovered. The large page search shades both segments together; the compact main-nav search shades its rounded input beneath the transparent button. Hovering autocomplete suggestions does not shade the search bar. These background changes apply only under `@media (hover: hover)` and preserve dimensions, borders, text/icon colors, focus indicators and responsive expansion.
+
+The enabled content-owner trigger uses `--clr-bg-shade`, not the search bars' alternate-shade token, on hover-capable pointers. This is a local adaptation of the upstream secondary search treatment, not an imported dropdown component. Existing option-row hover, checkbox selection and expanded-state styling remain unchanged. The source reference is `design-system/ntg/src/dxp/search-field/search-field.css` in the pinned monorepo; no sibling checkout or remote source is needed at build time.
 
 To refresh, review the upstream changes and reuse permission, copy the same source modules from the chosen clean checkout, update both revisions and SHA-256 values in the manifest, regenerate, and run the public/build/browser checks. Do not edit the vendor inputs as local overrides or require the sibling checkout at build time. Browser checks compare native control states with an isolated upstream fixture and check token resolution, shell isolation, filtering and mobile draft behavior. `check:public` verifies that source and published bundles match.
 
@@ -130,7 +144,7 @@ Font Awesome is loaded from kit `https://kit.fontawesome.com/9bf658a5c7.js` with
 
 The main menu stays beside the logo and search whenever the complete header row fits. It never moves into a separate white navigation row. JavaScript measures the intrinsic navigation width and available header space, checking again on resize, font loading and search expansion. When the items no longer fit, the inline navigation is replaced by a hamburger button that opens the same menu in a panel below the header. The fit threshold depends on available space and rendered content, not a fixed desktop breakpoint. At 768px and below, the mobile menu is always used. Personalized avatars are not included.
 
-Hovering main-menu and Quick links items underlines the link label only; it does not change link color or background, and dropdown icons remain undecorated.
+In the inline main menu, opening a dropdown keeps its top-level link background transparent. Hovering main-menu and Quick links items underlines the link label only; it does not change link color or background, and dropdown icons remain undecorated.
 
 Inline main-menu dropdowns match and center on the header content row, up to 1232px wide and shrinking with the row's 32px side gutters on narrower screens. Submenu labels wrap within their columns so long titles remain readable without overflowing the dropdown.
 
@@ -142,7 +156,7 @@ The compact search independently collapses to an icon below 1296px; the icon is 
 
 ## Search Autocomplete
 
-The NTG Central breadcrumb above Search has been removed; the logo and navigation branding remain. The main search form now sits inside the header beneath the white Roboto bold Search heading (48px font size and line height), with a 32px gap between the main navigation band and the heading. A 32px gap separates the title from the white search field, which is 56px high and at most 812px wide, shrinking to fit smaller screens. The input uses 16px text, 24px line height, 16px left padding, and a right-aligned search button. The compact navigation search is unchanged and does not use autocomplete.
+The NTG Central breadcrumb above Search has been removed; the logo and navigation branding remain. The main search form now sits inside the header beneath the white Roboto bold Search heading (48px font size and line height), with a 32px gap between the main navigation band and the heading. A 32px gap separates the title from the white search field, which is 56px high and at most 812px wide, shrinking to fit smaller screens. The input uses 16px text, 24px line height, 16px left padding, and a right-aligned search button. The compact navigation search shares the page search's alternate-shade hover background but remains a separate form without autocomplete.
 
 Suggestions appear when the focused field contains at least two characters after trimming leading and trailing whitespace. Matching is case-insensitive and includes substrings, with prefix matches first and original dataset order retained within each group. Up to six matches are shown. Clearing the field, dropping below the threshold, or entering a query with no matches hides the dropdown.
 
@@ -160,7 +174,7 @@ Popular-search links run local searches on ordinary clicks and have encoded same
 
 The URL is read only at startup. Refreshing restores its original query, not subsequent in-place searches or filters; browser Back does not undo those interactions. To share a query, set the `searchterm` parameter explicitly. Queries that normalize to no searchable letters or digits also show Popular searches.
 
-Results replace the main content region while retaining the header and footer. Legacy saved results and embedded snapshot scripts have been removed. Result types are All results, Information, Policy, Contact, Online system, Enterprise service, Agency, News and Event/Training. Their controls use Font Awesome Pro Light (`fal`) icons; other local search icons retain their existing Solid (`fas`) styling. The AI panel is intentionally omitted.
+Results replace the main content region while retaining the header and footer. Legacy saved results and embedded snapshot scripts have been removed. Result types are All results, Information, Policy, Contact, Online system, Enterprise service, Agency, News and Event/Training. At desktop widths, their controls adapt the Figma pill's default, hover and focus states but keep square corners and a visible 1px border. Default buttons use the Central link color on the default background; hover uses the alternate shade background; keyboard focus has a 4px focus-color outline. The existing primary selected state and inverse text remain unchanged. Controls keep their Font Awesome Pro Light (`fal`) category icons; other local search icons retain their existing Solid (`fas`) styling. The AI panel is intentionally omitted.
 
 Contact results show their approved title, content owner and a synthetic email address. Real roles, locations, phone numbers and extensions are stripped from the public dataset. Contact results omit breadcrumbs, dates, excerpts and location. Demo contact addresses remain actionable but are not operational support channels; they are marked as demo data in the index. On narrow screens, contact details stack vertically.
 
@@ -172,8 +186,9 @@ The No results found section contains its heading and a prompt to try another qu
 - Type counts respect the query and category/owner selections but ignore the active type. Each facet's counts respect the other groups while ignoring its own selections.
 - Sort options are relevance, newest update, A-Z and Z-A. Undated records sort last by update date.
 - Ten results appear per page. Query, type, sort and filter changes reset to page one. Clear all filters retains the query and resets type, facets, sorting and page.
+- Desktop result-type buttons use square corners, visible subtle borders, the Figma pill's default/hover colors and keyboard-focus ring, and the existing primary selected state. Below 900px, these buttons are replaced by the native result-type dropdown.
 - Show all expands categories. Sort uses 24px navy radio buttons; categories and owners use 24px navy checkboxes. Selected radios show a white center dot, and checked boxes show a white tick. Content-owner options have 64px-high rows, support multiple selections, close on Escape or outside clicks, and restore keyboard focus.
-- Below 900px, a full-width result-type dropdown replaces the type buttons. Filter and sort opens a modal panel beneath the navy header, with scrollable options and fixed Show N results/Clear all filters actions. Sort and facet edits update a preview count but only apply when Show results is selected. Close or Escape discards edits, including draft clears; Escape first closes an open content-owner dropdown. Applying resets pagination. Type-dropdown changes apply immediately. Desktop filters still apply immediately. Popular searches stacks below 769px.
+- Below 900px, Filter and sort opens a modal panel beneath the navy header, with scrollable options and fixed Show N results/Clear all filters actions. Sort and facet edits update a preview count but only apply when Show results is selected. Close or Escape discards edits, including draft clears; Escape first closes an open content-owner dropdown. Applying resets pagination. Type-dropdown changes apply immediately. Desktop filters still apply immediately. Popular searches stacks below 769px.
 - Mobile results use the pale-grey page background (`#ecf0f0`) with white dropdown, filter-trigger and result surfaces. The dropdown is 52px high; result rows have 24px padding. The filter trigger uses the existing Font Awesome Pro Light vertical sliders icon (`fal fa-sliders-up`), with matching light chevrons on the trigger and dropdown. The dropdown remains a native labelled select; its decorative chevron does not intercept pointer events.
 - The mobile filter panel keeps keyboard focus inside while open, locks background scrolling, and restores focus and scroll position when closed. Each opening starts at the top; draft edits preserve the panel's scroll position. Submitting a new search or resizing to desktop closes the panel and discards unapplied selections.
 
@@ -213,7 +228,7 @@ Dates without a valid content-modified timestamp use a deterministic demo date. 
 
 Required fields are a unique lowercase ASCII `id` (letters, digits and hyphens), nonblank `label`, recognized `type`, `description`, nonempty recognized `categories` array and nonblank `owner`. Optional `updated` dates must be valid `YYYY-MM-DD` calendar dates. Optional fields include `keywords`, `aliases`, `breadcrumbs`, `url`, `role`, `location`, `email`, `phone`, `extension`, `source`, `inferredFields`, and `demoFields`. Aliases are searched by autocomplete and, together with labels and keywords, can contribute to result-page “Did you mean?” suggestions. Source-backed multi-factor authentication records include `MFA`, `2FA`, `2SV`, `multifactor authentication`, `two-factor authentication`, and `two-step verification` variants. Category/type vocabularies are exported by [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js). Invalid records and duplicate IDs are skipped; an empty valid index is an error. Navigation only accepts HTTPS, mail and telephone URLs.
 
-Autocomplete and results share one cached JSON request per page load, with no per-keystroke network requests or added dependencies. Suggestions use the same metadata-aware matching and ranking as results, including descriptions and keywords. A failed load is evicted from the cache so search can retry. If initial autocomplete loading fails, reload after restoring the data to restore suggestions. Text, query highlighting and record details are built using DOM text APIs, not HTML interpolation. Reload after editing the JSON; keep it valid JSON without comments or trailing commas.
+Autocomplete and results share one cached JSON request per page load, with no per-keystroke network requests or added dependencies. Suggestions use the same metadata-aware matching and ranking as results, including descriptions and keywords. A failed load is evicted from the cache so search can retry. If initial autocomplete loading fails, reload after restoring the data to restore suggestions. Each suggestion includes a decorative search icon, and matching query terms are bolded, including prefix matches. Text, query highlighting and record details are built using DOM text APIs, not HTML interpolation. Reload after editing the JSON; keep it valid JSON without comments or trailing commas.
 
 Popular-search labels and links are authored in [Search \_ NTG Central.html](Search%20_%20NTG%20Central.html), separately from the index. When changing them, update the `popularSearches` export in [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js) as well, so coverage tests check the same queries. Ensure each popular query still matches an indexed record. Tests assert 1,116 total records, a 120-record curated prefix and the original first/24th labels; update those expectations only when intentionally changing the dataset contract.
 
@@ -241,10 +256,24 @@ Run the focused Central migration checks against a fresh public build:
 ```bash
 npm run build
 npm run check:public
-npm run test:browser -- --grep "Central|mobile filter drafts|no-results section|both NTG logos"
+npm run test:browser -- --grep "Central|mobile filter drafts|no-results section|both NTG logos|Search result type buttons match square pill states"
 ```
 
-These checks compare checkbox/radio states with an isolated upstream fixture, verify keyboard focus and nonblank white pixels in the embedded checkbox SVG, and check resolved tokens and unchanged header/footer styles at 320, 390, 900 and 1440px. They also exercise category/owner selection, mobile drafts, the empty state and shared logos. Screenshots are saved under the ignored test-results directory for inspection; they are not baseline image comparisons. Playwright serves the existing public artifact, so rebuild after source CSS changes. Use the loopback proxy exclusions documented above when needed.
+These checks compare checkbox/radio states with an isolated upstream fixture, verify keyboard focus and nonblank white pixels in the embedded checkbox SVG, and check resolved tokens and unchanged header/footer styles at 320, 390, 900 and 1440px. The square-pill checks cover default, hover, keyboard focus, selected colors and borders at 900 and 1440px; responsive token checks confirm the dropdown remains in use below 900px. The suite also exercises category/owner selection, mobile drafts, the empty state and shared logos. Screenshots are saved under the ignored test-results directory for inspection; they are not baseline image comparisons. Playwright serves the existing public artifact, so rebuild after source CSS changes. Use the loopback proxy exclusions documented above when needed.
+
+### Search Hover Checks
+
+Run the focused checks for both search bars against a fresh public build:
+
+```bash
+npm run build
+npm run test:browser -- --grep "main nav search hover|search hover joins|inactive on touch devices"
+npm run check:public
+```
+
+These six browser checks passed locally on 28 October 2026. They cover the page search at 390 and 1440px, the compact search at 390, 900 and 1440px, and a touch context with no hover capability. Assertions check token-derived backgrounds, input/button hover, pointer exit, stable geometry and preserved focus styling. They also verify that suggestion hover does not activate the page search and that tokens do not leak to the surrounding header/footer. Screenshots are saved under the ignored test-results directory. Public-build tests separately enforce token-only scope for both search forms.
+
+The two `owner hover preserves open and checked states` browser tests remain unresolved: their latest run failed the closed-trigger focus-outline assertion before reaching the open/checked assertions. The six passing search checks exclude those owner tests and do not establish that the full browser suite passes. No updated artifact was published as part of these local checks. Use `PUBLIC_PORT` and loopback proxy exclusions as documented above when needed.
 
 ### Utility Dropdown Checks
 
@@ -257,13 +286,13 @@ npm run test:browser -- --grep "Online systems"
 
 The five tests in [tests/public-site.spec.js](tests/public-site.spec.js) verify that the submenu is unobstructed at 769, 900 and 1440px using browser hit-testing and a trial click, rather than relying only on a visibility assertion. They also check hover styling, link attributes, Enter/Space activation, Tab access, synchronized `aria-expanded`, and closing by second click, outside click and Escape. At 390 and 768px, they confirm that the utility bar stays hidden and Quick links remains visible when the mobile menu opens. Desktop/tablet screenshots are saved under the ignored test-results directory.
 
-Local verification on 28 October 2026 passed the build, all 9 public-build tests and all 5 utility-dropdown browser tests. Screenshots at 900 and 1440px confirmed the submenu appears above the main header. The full browser run passed 13 of 19 tests; the six failures concern the external-result-link assertion, spelling-correction assertion and four icon checks described below. This does not establish a passing full-suite release gate or publication of the updated artifact.
+Local verification on 28 October 2026 passed the build, all 9 public-build tests and all 5 utility-dropdown browser tests. Screenshots at 900 and 1440px confirmed the submenu appears above the main header. The recorded full browser run, before the search-hover tests were added, passed 18 of 24 tests, including all square-pill and responsive token checks. Its six unrelated failures are described below; this does not establish a passing full-suite release gate or publication of the updated artifact.
 
 ### Recorded Migration Checks
 
 Local verification on 28 October 2026 passed 13 search unit tests, 9 public-build tests, artifact checks and all 8 focused browser checks. This is a local verification record, not evidence that the updated artifact has been published or that the full browser suite passes.
 
-The full browser run exposed six failures independently reproduced with pre-migration search assets: its external-link assertion assumes the first `apply` results page contains an external title link; its correction assertion expects a literal `leave` button rather than the current suggested record titles; and four viewport icon checks fail when the Font Awesome kit returns HTTP 403. The observed correction titles were Leave entitlements, Apply for leave and Annual leave policy. Resolve the stale data assertions and kit authorization before treating the full browser suite as a release gate that passes. The focused command above does not replace that full-suite gate.
+The recorded full browser run's six failures were reproduced with the original committed search stylesheet: its external-link assertion assumes the first `apply` results page contains an external title link; its correction assertion expects a literal `leave` button rather than the current suggested record titles; and four viewport icon checks fail to load the header search icon. The observed correction titles were Leave entitlements, Apply for leave and Annual leave policy. Resolve the stale data assertions and icon loading before treating the full browser suite as a passing release gate. The focused command above does not replace that full-suite gate.
 
 For browser checks, use the localhost Vite URL and verify:
 

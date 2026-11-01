@@ -24,7 +24,7 @@ export async function compileSearchDesignSystem(sources, { scoped = true } = {})
   tokens.walkRules((rule) => {
     if (rule.selector !== ':root[theme="central"]')
       throw new Error(`Unexpected token selector: ${rule.selector}`);
-    if (scoped) rule.selector = `${scope}, ${scope}::backdrop`;
+    if (scoped) rule.selector = `${scope}, ${scope}::backdrop, #ntgc-site-search, form[name="ntgc-search-form"]`;
   });
   const result = await postcss([nesting()]).process(sources["inputs.css"], { from: undefined });
   const controls = result.root;

@@ -94,8 +94,17 @@ test("Central input bundle is deterministic, scoped and safe for public CSS sani
   assert.ok(css.includes("local-ntg-checkbox-checked"));
   assert.ok(!css.includes(":root"));
   const root = postcss.parse(css);
+  const tokenRule = root.nodes.find((node) => node.type === "rule");
+  assert.ok(tokenRule.selectors.includes("#ntgc-site-search"));
+  assert.ok(tokenRule.selectors.includes('form[name="ntgc-search-form"]'));
+  assert.ok(tokenRule.nodes.every((node) => node.type === "decl" && node.prop.startsWith("--")));
   root.walkRules((rule) => {
     if (rule.parent.type === "atrule" && rule.parent.name === "keyframes") return;
+    if (rule.selectors.includes("#ntgc-site-search")) {
+      assert.equal(rule.selector, tokenRule.selector);
+      assert.ok(rule.nodes.every((node) => node.type === "decl" && node.prop.startsWith("--")));
+      return;
+    }
     for (const selector of rule.selectors)
       assert.ok(selector.startsWith(":is(.ntgc-local-search, .local-record-dialog)"), selector);
     assert.ok(!rule.nodes.some((node) => node.type === "rule"));
@@ -115,7 +124,8 @@ test("vendored inputs match their recorded checksums and consumed search tokens 
   postcss.parse(sources["central.scoped.tokens.css"]).walkDecls((declaration) => tokens.add(declaration.prop));
   const localCss = await readFile(new URL("search-results.css", base), "utf8");
   assert.ok(!/--local-(ink|body|green|border)|#[\da-f]{3,8}\b|\bRoboto\b/i.test(localCss));
-  postcss.parse(localCss).walkDecls((declaration) => {
+  const headerCss = await readFile(new URL("header-compact.css", base), "utf8");
+  postcss.parse(`${localCss}\n${headerCss}`).walkDecls((declaration) => {
     for (const [, token] of declaration.value.matchAll(/var\((--[\w-]+)/g))
       assert.ok(token === "--local-filter-top" || tokens.has(token), `Missing token: ${token}`);
   });
