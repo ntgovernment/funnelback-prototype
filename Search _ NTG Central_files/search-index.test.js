@@ -120,6 +120,23 @@ test("pagination is ten items and clamps invalid pages", () => {
   assert.equal(last.records.length, 3);
   assert.equal(searchIndex(records, { query: "leave", page: -1 }).page, 1);
 });
+test("All results count does not change with the selected type", () => {
+  const records = [
+    ...Array.from({ length: 12 }, (_, index) => ({
+      ...fixture[0],
+      id: `apply-${index}`,
+      label: "Apply now",
+      type: fixture[0].type,
+    })),
+    { ...fixture[0], id: "partial", label: "Applicant guide", type: fixture[1].type },
+  ];
+  const base = searchIndex(records, { query: "apply" });
+  for (const type of ["", fixture[0].type, fixture[1].type]) {
+    const result = searchIndex(records, { query: "apply", type });
+    assert.equal(result.allCount, base.allCount);
+    assert.deepEqual(result.typeCounts, base.typeCounts);
+  }
+});
 test("related partial matches fill a short first page after exact matches", () => {
   const records = [
     {

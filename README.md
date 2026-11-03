@@ -183,7 +183,7 @@ Search matches all query words across titles, descriptions, keywords, owners, ca
 The No results found section contains its heading and a prompt to try another query or remove filters; it does not duplicate the Clear all filters action. Clearing filters remains available in the desktop sidebar or mobile filter panel. The search section keeps a minimum height of 534px, including popular-search and empty states.
 
 - Categories and owners use OR within each group, AND across groups and the selected result type.
-- Type counts respect the query and category/owner selections but ignore the active type. Each facet's counts respect the other groups while ignoring its own selections.
+- Type counts respect the query and category/owner selections but ignore the active type, including whether closest-match fallback results are added, so All results stays constant across type tabs. Each facet's counts respect the other groups while ignoring its own selections.
 - Sort options are relevance, newest update, A-Z and Z-A. Undated records sort last by update date.
 - Ten results appear per page. Query, type, sort and filter changes reset to page one. Clear all filters retains the query and resets type, facets, sorting and page.
 - Desktop result-type buttons use square corners, visible subtle borders, the Figma pill's default/hover colors and keyboard-focus ring, and the existing primary selected state. Below 900px, these buttons are replaced by the native result-type dropdown.
