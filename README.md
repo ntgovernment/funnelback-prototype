@@ -1,6 +1,6 @@
 # NTG Central Search Prototype
 
-Interactive NTG Central search prototype with a shared 1,116-record index: 120 curated records and 996 imported records. Autocomplete, filtering, sorting and pagination run entirely in the browser; no search backend or AI service is required. The tracked HTML and index have been mechanically sanitized for public testing.
+Interactive NTG Central search prototype with a shared 1,117-record index: 121 curated records and 996 imported records. Autocomplete, filtering, sorting and pagination run entirely in the browser; no search backend or AI service is required. The tracked HTML and index have been mechanically sanitized for public testing.
 
 ## Public Deployment
 
@@ -196,7 +196,7 @@ Real, supplied external destinations open in a new tab. Records without a destin
 
 ### Editing The Index
 
-[Search \_ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json) contains 120 curated records followed by 996 sanitized imported records. The original curated records stay first, and the original 24 IDs/labels remain unchanged. The private Funnelback snapshot, `top1000.json`, is ignored and is not required to run, test or build a clean checkout. This local data is illustrative and is not a live or authoritative search index.
+[Search \_ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json) contains 121 curated records followed by 996 sanitized imported records. The original curated records stay first, and the original 24 IDs/labels remain unchanged. The curated MFA entry uses synthesized general guidance and a demo-marked `2026-11-03` update date; related imported records retain their source descriptions with the same general MFA context appended. This is illustrative, not official NTG setup guidance. Result breadcrumbs omit the repeated NTG Central root and begin with each record's own hierarchy. The private Funnelback snapshot, `top1000.json`, is ignored and is not required to run, test or build a clean checkout. This local data is illustrative and is not a live or authoritative search index.
 
 Only maintainers with an approved private snapshot should regenerate the merged index. Regeneration can reintroduce real source contact details; sanitize the tracked files immediately afterwards, review the changes and rerun validation before committing:
 
@@ -226,11 +226,11 @@ Dates without a valid content-modified timestamp use a deterministic demo date. 
 ]
 ```
 
-Required fields are a unique lowercase ASCII `id` (letters, digits and hyphens), nonblank `label`, recognized `type`, `description`, nonempty recognized `categories` array and nonblank `owner`. Optional `updated` dates must be valid `YYYY-MM-DD` calendar dates. Optional fields include `keywords`, `aliases`, `breadcrumbs`, `url`, `role`, `location`, `email`, `phone`, `extension`, `source`, `inferredFields`, and `demoFields`. Aliases are searched by autocomplete and, together with labels and keywords, can contribute to result-page “Did you mean?” suggestions. Source-backed multi-factor authentication records include `MFA`, `2FA`, `2SV`, `multifactor authentication`, `two-factor authentication`, and `two-step verification` variants. Category/type vocabularies are exported by [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js). Invalid records and duplicate IDs are skipped; an empty valid index is an error. Navigation only accepts HTTPS, mail and telephone URLs.
+Required fields are a unique lowercase ASCII `id` (letters, digits and hyphens), nonblank `label`, recognized `type`, `description`, nonempty recognized `categories` array and nonblank `owner`. Optional `updated` dates must be valid `YYYY-MM-DD` calendar dates; synthesized dates are marked in `demoFields`. Optional fields include `keywords`, `aliases`, `breadcrumbs`, `url`, `role`, `location`, `email`, `phone`, `extension`, `source`, `inferredFields`, and `demoFields`. Aliases are searched by autocomplete and, together with labels and keywords, can contribute to result-page “Did you mean?” suggestions. MFA search recognizes `MFA`, `2FA`, `2SV`, `multifactor authentication`, `two-factor authentication`, and `two-step verification` variants. Category/type vocabularies are exported by [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js). Invalid records and duplicate IDs are skipped; an empty valid index is an error. Navigation only accepts HTTPS, mail and telephone URLs.
 
 Autocomplete and results share one cached JSON request per page load, with no per-keystroke network requests or added dependencies. Suggestions use the same metadata-aware matching and ranking as results, including descriptions and keywords. A failed load is evicted from the cache so search can retry. If initial autocomplete loading fails, reload after restoring the data to restore suggestions. Each suggestion includes a decorative search icon, and matching query terms are bolded, including prefix matches. Text, query highlighting and record details are built using DOM text APIs, not HTML interpolation. Reload after editing the JSON; keep it valid JSON without comments or trailing commas.
 
-Popular-search labels and links are authored in [Search \_ NTG Central.html](Search%20_%20NTG%20Central.html), separately from the index. When changing them, update the `popularSearches` export in [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js) as well, so coverage tests check the same queries. Ensure each popular query still matches an indexed record. Tests assert 1,116 total records, a 120-record curated prefix and the original first/24th labels; update those expectations only when intentionally changing the dataset contract.
+Popular-search labels and links are authored in [Search \_ NTG Central.html](Search%20_%20NTG%20Central.html), separately from the index. When changing them, update the `popularSearches` export in [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js) as well, so coverage tests check the same queries. Ensure each popular query still matches an indexed record. Tests assert 1,117 total records, a 121-record curated prefix and the original first/24th labels; update those expectations only when intentionally changing the dataset contract.
 
 ## Validation
 
@@ -330,7 +330,7 @@ This is an in-browser demonstration, not a production Funnelback integration: th
 - [Search \_ NTG Central_files/header-compact.css](Search%20_%20NTG%20Central_files/header-compact.css): compact header, main search field, and suggestions styling
 - [Search \_ NTG Central_files/header-compact.js](Search%20_%20NTG%20Central_files/header-compact.js): utility dropdown, responsive search, fit-based main-menu placement and mobile submenu Back controls
 - [Search \_ NTG Central_files/search-autocomplete.js](Search%20_%20NTG%20Central_files/search-autocomplete.js): matching and accessible autocomplete interaction
-- [Search \_ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json): shared 1,116-record sanitized index
+- [Search \_ NTG Central_files/search-suggestions.json](Search%20_%20NTG%20Central_files/search-suggestions.json): shared 1,117-record sanitized index
 - [Search \_ NTG Central_files/search-index.js](Search%20_%20NTG%20Central_files/search-index.js): cached loading, validation and pure search model
 - [Search \_ NTG Central_files/search-results.js](Search%20_%20NTG%20Central_files/search-results.js): query routing, result rendering, filters and local details
 - [Search \_ NTG Central_files/search-results.css](Search%20_%20NTG%20Central_files/search-results.css): scoped Popular searches, responsive result layouts, and filter-control styling

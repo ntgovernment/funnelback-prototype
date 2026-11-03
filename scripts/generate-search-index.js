@@ -31,6 +31,8 @@ const multiFactorAliases = [
   "two-step verification",
   "2-step verification",
 ];
+const multiFactorContext =
+  "Multi-factor authentication adds a second verification step at sign-in to help protect an account. Follow your organisation's approved instructions for setup.";
 
 const sourceAgencyOwners = {
   "buildings-and-property": "Corporate and Digital Development",
@@ -517,6 +519,37 @@ function demoDate(id) {
   return new Date(Date.UTC(2024, 0, 1 + days)).toISOString().slice(0, 10);
 }
 
+function shortNameFor(label) {
+  const value = text(label);
+  const parenthetical = value.match(/\(([A-Z0-9]{2,10})\)/);
+  if (parenthetical) return parenthetical[1];
+
+  const prefix = value.match(/^(.+?)\s+(?:[-–—:]|\()/)?.[1]?.trim();
+  if (prefix) return prefix;
+  if (/^[A-Z0-9]+(?:\s+[A-Z0-9]+)*$/.test(value)) return value;
+
+  const excluded = new Set(["a", "an", "and", "for", "of", "the"]);
+  const initials = (value.match(/[A-Za-z0-9]+/g) || [])
+    .filter((word) => !excluded.has(word.toLocaleLowerCase("en-AU")))
+    .map((word) => word[0].toLocaleUpperCase("en-AU"))
+    .join("");
+  return initials || value;
+}
+
+function withOnlineSystemLinks(record) {
+  if (record.type !== "Online system") return record;
+  const shortName = record.shortName?.trim() || shortNameFor(record.label);
+  const host = shortName
+    .toLocaleLowerCase("en-AU")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return {
+    ...record,
+    shortName,
+    systemUrl: record.systemUrl || `https://${host}.nt.gov.au`,
+  };
+}
+
 function markCuratedDemoFields(record) {
   const fields = new Set(record.demoFields || []);
   const owner =
@@ -526,11 +559,11 @@ function markCuratedDemoFields(record) {
   if (record.phone) fields.add("phone");
   if (record.role) fields.add("role");
   if (record.location) fields.add("location");
-  return {
+  return withOnlineSystemLinks({
     ...record,
     owner,
     ...(fields.size ? { demoFields: [...fields] } : {}),
-  };
+  });
 }
 
 export function convertResults(results, curatedRecords = []) {
@@ -572,9 +605,12 @@ export function convertResults(results, curatedRecords = []) {
     }
     usedUrls.add(url);
 
-    const description = descriptionFor(result, raw, title);
+    const sourceDescription = descriptionFor(result, raw, title);
     const keywords = keywordsFor(raw);
-    const aliases = aliasesFor(title, description, keywords);
+    const aliases = aliasesFor(title, sourceDescription, keywords);
+    const description = aliases.length
+      ? `${sourceDescription} ${multiFactorContext}`
+      : sourceDescription;
     const type = inferType(result, raw, description, keywords, url);
     const categories = categoriesFor(result, raw, description, keywords, url);
     const ownerMapping = agencyOwnerFor(title, raw);
@@ -591,7 +627,7 @@ export function convertResults(results, curatedRecords = []) {
       demoFields.push("updated");
     }
 
-    const record = {
+    const record = withOnlineSystemLinks({
       id,
       label: title,
       type,
@@ -605,7 +641,7 @@ export function convertResults(results, curatedRecords = []) {
       ...(aliases.length ? { aliases } : {}),
       source: text(raw.syssource || raw.syscollection) || "NTG Central",
       inferredFields,
-    };
+    });
     if (type === "Contact") {
       const contactDetails = contactDetailsFor(description);
       if (contactDetails.email) record.email = contactDetails.email;

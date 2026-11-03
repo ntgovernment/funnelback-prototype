@@ -150,12 +150,8 @@ for (const width of [769, 900, 1440]) {
     await expect(link).toHaveCSS("color", defaultColor);
     await expect(link).toHaveCSS("background-color", defaultBackground);
     await expect(link).toHaveCSS("text-decoration-line", "underline");
-    await expect(link).toHaveAttribute(
-      "href",
-      "https://ntgcentral.nt.gov.au/online-systems",
-    );
-    await expect(link).toHaveAttribute("target", "_blank");
-    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(link).toHaveAttribute("href", "#");
+    await expect(link).not.toHaveAttribute("target", /.*/);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth + 1,
@@ -494,6 +490,43 @@ for (const width of [390, 1440]) {
   });
 }
 
+test("header menu links stay on the page and the main nav is inline when wide", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("./");
+  await expect(page.locator(".toggle-mobile-nav")).toBeHidden();
+  const items = page.locator(
+    ".ntgc-header__inline-main-menu #mainmenu ul.level-one > li:visible > a",
+  );
+  expect(await items.count()).toBe(4);
+  const hrefs = await page
+    .locator(".ntgc-navigation--utility a, #mainmenu a")
+    .evaluateAll((links) =>
+      links.map((link) => [
+        link.getAttribute("href"),
+        link.getAttribute("target"),
+      ]),
+    );
+  for (const [href, target] of hrefs) {
+    expect(href).toBe("#");
+    expect(target).toBeNull();
+  }
+});
+
+test("clicking an autocomplete suggestion submits the search", async ({
+  page,
+}) => {
+  await page.goto("./?searchterm=apply");
+  const input = page.locator("#search");
+  await input.fill("Apply f");
+  const option = page.locator('#search-suggestions [role="option"]').first();
+  const label = (await option.textContent()).trim();
+  await option.click();
+  await expect(page).toHaveURL(/searchterm=/);
+  await expect(page.locator("#search")).toHaveValue(label);
+});
+
 test("search hover and owner hover stay inactive on touch devices", async ({
   browser,
   baseURL,
@@ -801,6 +834,18 @@ test("root, original entry, deep links and assets use only approved external req
   ).toContain("noopener");
 });
 
+test("footer links stay on the current page", async ({ page }) => {
+  await page.goto("./");
+  const links = await page.locator("footer a").evaluateAll((anchors) =>
+    anchors.map((anchor) => ({
+      href: anchor.getAttribute("href"),
+      target: anchor.getAttribute("target"),
+    })),
+  );
+  expect(links.length).toBeGreaterThan(0);
+  expect(links.every(({ href, target }) => href === "#" && target !== "_blank")).toBe(true);
+});
+
 test("keyboard autocomplete, local search, details and correction", async ({
   page,
 }) => {
@@ -816,6 +861,16 @@ test("keyboard autocomplete, local search, details and correction", async ({
   await input.press("Enter");
   await expect(page.locator(".local-result").first()).toBeVisible();
   await page.goto("./?searchterm=Apply%20for%20leave");
+  const updatedLabel = page
+    .locator(".local-result")
+    .filter({ hasText: "Apply for leave" })
+    .locator(".local-updated");
+  await expect(updatedLabel).toHaveText(/^Last updated:/);
+  const breadcrumbs = page
+    .locator(".local-result")
+    .filter({ hasText: "Apply for leave" })
+    .locator(".local-breadcrumbs");
+  await expect(breadcrumbs).not.toContainText("NTG Central");
   const detail = page.locator("button.local-result-title").first();
   await detail.click();
   await expect(page.locator(".local-record-dialog")).toBeVisible();
@@ -826,6 +881,45 @@ test("keyboard autocomplete, local search, details and correction", async ({
   await expect(
     page.getByRole("button", { name: "leave", exact: true }).first(),
   ).toBeVisible();
+});
+
+test("MFA result displays its synthesized last-updated date", async ({
+  page,
+}) => {
+  await page.goto("./?searchterm=MFA");
+  const result = page
+    .locator(".local-result")
+    .filter({ hasText: "Multi-factor authentication (MFA)" })
+    .first();
+  await expect(result).toBeVisible();
+  await expect(result.locator(".local-updated")).toHaveText(
+    "Last updated: 3 November 2026",
+  );
+});
+
+test("Online system title and launch links use separate destinations", async ({
+  page,
+}) => {
+  await page.goto("./?searchterm=VBS");
+  const result = page
+    .locator(".local-result")
+    .filter({ hasText: "VBS - Vehicle Booking System" })
+    .first();
+  await expect(result).toBeVisible();
+
+  const title = result.locator(".local-result-title");
+  await expect(title).toHaveAttribute(
+    "href",
+    "https://ntgcentral.nt.gov.au/online-systems/vehicle-booking-system",
+  );
+
+  const openLink = result.locator(".local-actions a").first();
+  await expect(openLink).toHaveText("Open VBS");
+  await expect(openLink).toHaveAttribute("href", "https://vbs.nt.gov.au/");
+  await expect(result.locator(".local-actions a").nth(1)).toHaveText(
+    "Contact support",
+  );
+  await expect(result.locator(".local-updated")).toHaveCount(0);
 });
 
 test("no-results section omits clear all filters", async ({ page }) => {

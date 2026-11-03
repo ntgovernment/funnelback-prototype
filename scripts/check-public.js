@@ -91,7 +91,7 @@ for (const file of localFiles) {
 const records = JSON.parse(
   await readFile(path.join(root, assets, "search-suggestions.json"), "utf8"),
 );
-assert.equal(records.length, 1116);
+assert.equal(records.length, 1117);
 assert.equal(
   records.filter((record) => record.id.startsWith("fb-")).length,
   996,

@@ -240,6 +240,8 @@ test("validation rejects duplicate IDs, unknown types and invalid dates", () => 
       { ...fixture[0], id: undefined },
       { ...fixture[0], id: "date", updated: "wrong" },
       { ...fixture[0], id: "calendar", updated: "2026-02-30" },
+      { ...fixture[0], id: "short-name", shortName: 123 },
+      { ...fixture[0], id: "system-url", systemUrl: "javascript:alert(1)" },
       { ...fixture[0], id: "alias", aliases: "MFA" },
     ]).length,
     3,
@@ -262,14 +264,14 @@ test("Funnelback conversion maps source facts and marks deterministic fallbacks"
       },
     },
     {
-      title: "Corporate Directory",
-      uri: "https://ntgcentral.nt.gov.au/online-systems/corporate-directory",
+      title: "VBS - Vehicle Booking System",
+      uri: "https://ntgcentral.nt.gov.au/online-systems/vehicle-booking-system",
       excerpt:
         "Provides data and authentication services for business applications.",
       raw: {
         syssource: "online-systems",
         syscollection: "NTGC-col",
-        assetlineage: "NTG Central|Online systems|Corporate Directory",
+        assetlineage: "NTG Central|Online systems|VBS - Vehicle Booking System",
       },
     },
     {
@@ -321,6 +323,12 @@ test("Funnelback conversion maps source facts and marks deterministic fallbacks"
   assert.ok(first.records[0].keywords.includes("union representative"));
   assert.deepEqual(first.records[0].breadcrumbs, ["Services and support"]);
   assert.equal(first.records[1].type, "Online system");
+  assert.equal(first.records[1].shortName, "VBS");
+  assert.equal(first.records[1].systemUrl, "https://vbs.nt.gov.au");
+  assert.equal(
+    first.records[1].url,
+    "https://ntgcentral.nt.gov.au/online-systems/vehicle-booking-system",
+  );
   assert.equal(first.records[1].owner, "Corporate and Digital Development");
   assert.equal(first.records[1].email, "service-demo@example.org");
   assert.ok(first.records[1].demoFields.includes("updated"));
@@ -358,12 +366,48 @@ test("MFA source concepts support acronym autocomplete and spelling corrections"
   }));
   const records = convertResults(related).records;
   assert.equal(records.length, 3);
+  assert.ok(
+    records.every((record) =>
+      record.description.includes(
+        "Follow your organisation's approved instructions for setup.",
+      ),
+    ),
+  );
   for (const alias of ["MFA", "2FA", "2SV"]) {
     assert.ok(records.every((record) => record.aliases.includes(alias)));
     assert.equal(matchRecords(records, alias).length, 3);
   }
   assert.ok(matchRecords(records, "multifactor").length > 0);
   assert.equal(suggestCorrection(records, "mfaa"), "mfa");
+  const index = await readIndex();
+  const indexedMfaRecords = index.filter(
+    (record) =>
+      record.id.startsWith("fb-") && record.aliases?.includes("MFA"),
+  );
+  assert.deepEqual(
+    new Set(indexedMfaRecords.map((record) => record.label)),
+    new Set([
+      "ICT induction",
+      "Microsoft Office 365",
+      "Be alert for fake Canvas emails",
+    ]),
+  );
+  assert.ok(
+    indexedMfaRecords.every((record) =>
+      record.description.includes(
+        "Follow your organisation's approved instructions for setup.",
+      ),
+    ),
+  );
+  const mfaOverview = index.find(
+    (record) => record.id === "multifactor-authentication",
+  );
+  assert.ok(mfaOverview);
+  assert.equal(mfaOverview.url, undefined);
+  assert.equal(mfaOverview.updated, "2026-11-03");
+  assert.deepEqual(mfaOverview.demoFields, ["updated"]);
+  for (const query of ["MFA", "2FA", "multifactor authentication"])
+    assert.ok(matchRecords([mfaOverview], query).length > 0, query);
 });
 
 async function readIndex() {
@@ -377,7 +421,7 @@ async function readIndex() {
 
 test("expanded index preserves curated records and supports every popular query", async () => {
   const records = await readIndex();
-  assert.equal(records.length, 1116);
+  assert.equal(records.length, 1117);
   assert.equal(validateIndex(records).length, records.length);
   assert.equal(
     new Set(records.map((record) => record.id)).size,
@@ -395,7 +439,7 @@ test("expanded index preserves curated records and supports every popular query"
   assert.ok(records.every((record) => knownAgencyOwners.has(record.owner)));
   assert.ok(records.every((record) => !/department of/i.test(record.owner)));
   assert.ok(
-    records.slice(0, 120).every((record) => !record.id.startsWith("fb-")),
+    records.slice(0, 121).every((record) => !record.id.startsWith("fb-")),
   );
   assert.equal(
     records.filter((record) => record.id.startsWith("fb-")).length,

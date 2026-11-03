@@ -25,6 +25,8 @@ test("public records strip contact fields and provenance without dropping record
       email: "help@agency.invalid",
       phone: "08 8999 5511",
       extension: "95511",
+      businessUnit: "Operations",
+      department: "Agency Services",
       source: "private",
       role: "staff",
       location: "office",
@@ -35,8 +37,35 @@ test("public records strip contact fields and provenance without dropping record
   assert.equal(records[0].email, "contact-demo@example.org");
   assert.equal(records[0].url, "https://example.org/help");
   assert.ok(!JSON.stringify(records).includes("agency.invalid"));
-  for (const field of ["phone", "extension", "source", "role", "location"])
+  for (const field of [
+    "phone",
+    "extension",
+    "businessUnit",
+    "department",
+    "source",
+    "role",
+    "location",
+  ])
     assert.ok(!(field in records[0]));
+});
+
+test("public Online system records preserve reviewed launch fields", () => {
+  const [record] = sanitizeRecords([
+    {
+      id: "vbs",
+      label: "VBS - Vehicle Booking System",
+      type: "Online system",
+      description: "Book a government vehicle.",
+      categories: ["Technology"],
+      owner: "Corporate and Digital Development",
+      shortName: "VBS",
+      url: "https://ntgcentral.nt.gov.au/online-systems/vehicle-booking-system",
+      systemUrl: "https://vbs.nt.gov.au/?token=private",
+    },
+  ]);
+  assert.equal(record.shortName, "VBS");
+  assert.equal(record.url, "https://ntgcentral.nt.gov.au/online-systems/vehicle-booking-system");
+  assert.equal(record.systemUrl, "https://vbs.nt.gov.au/");
 });
 
 test("unreviewed fields and unsafe destinations fail closed", () => {

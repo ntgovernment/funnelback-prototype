@@ -77,8 +77,16 @@
     });
     document.addEventListener("ntgc:navigation-layout", closeMenu);
     document
+      .querySelectorAll(
+        '.ntgc-navigation--utility a[href="#"], .ntgc-navigation--main a[href="#"]',
+      )
+      .forEach((link) => {
+        link.removeAttribute("target");
+        link.removeAttribute("rel");
+      });
+    document
       .querySelectorAll(".ntgc-link-to-top")
-      .forEach((link) => link.setAttribute("href", "#top"));
+      .forEach((link) => link.setAttribute("href", "#"));
   };
   if (document.readyState === "loading")
     document.addEventListener("DOMContentLoaded", initialize);

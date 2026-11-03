@@ -171,9 +171,11 @@
     "description": "Search for employee contact details and agency teams.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-09-01",
+    "shortName": "SD",
     "categories": [
       "Services and applications"
     ],
+    "systemUrl": "https://sd.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -229,11 +231,13 @@
     "description": "View employee information and apply for leave through MyHR.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-09-15",
+    "shortName": "MESS",
     "categories": [
       "Employment types",
       "Technology"
     ],
     "keywords": "myHR leave applications",
+    "systemUrl": "https://mess.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -345,10 +349,12 @@
     "description": "Apply for services and track form approval workflows.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-09-24",
+    "shortName": "MRA",
     "categories": [
       "Services and applications"
     ],
     "url": "https://myforms.nt.gov.au/",
+    "systemUrl": "https://mra.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -971,10 +977,12 @@
     "description": "Browse learning activities and apply for training in this demonstration learning catalogue.",
     "owner": "Education and Training",
     "updated": "2026-09-23",
+    "shortName": "M",
     "categories": [
       "Career and development",
       "Technology"
     ],
+    "systemUrl": "https://m.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -986,9 +994,11 @@
     "description": "Demonstration entry for payroll information and payslip services.",
     "owner": "Treasury and Finance",
     "updated": "2026-10-06",
+    "shortName": "NP",
     "categories": [
       "Employment types"
     ],
+    "systemUrl": "https://np.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1000,9 +1010,11 @@
     "description": "Apply for services and review application progress in a sample service portal.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-09-26",
+    "shortName": "ESP",
     "categories": [
       "Services and applications"
     ],
+    "systemUrl": "https://esp.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1014,9 +1026,11 @@
     "description": "Find business records and track access application requests.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-08-14",
+    "shortName": "RW",
     "categories": [
       "Technology"
     ],
+    "systemUrl": "https://rw.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1028,9 +1042,11 @@
     "description": "Browse sample vehicle availability and prepare booking applications.",
     "owner": "Lands, Planning and Environment",
     "updated": "2026-07-11",
+    "shortName": "FB",
     "categories": [
       "Services and applications"
     ],
+    "systemUrl": "https://fb.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1042,9 +1058,11 @@
     "description": "Manage purchase requests and apply for purchasing access.",
     "owner": "Treasury and Finance",
     "updated": "2026-08-12",
+    "shortName": "PW",
     "categories": [
       "Finance and procurement"
     ],
+    "systemUrl": "https://pw.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1056,9 +1074,11 @@
     "description": "Track demonstration incidents, hazards and safety actions.",
     "owner": "Health, Northern Territory",
     "updated": "2026-09-09",
+    "shortName": "SRP",
     "categories": [
       "Health and safety"
     ],
+    "systemUrl": "https://srp.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1070,9 +1090,11 @@
     "description": "Share documents and apply for a new team workspace.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-08-26",
+    "shortName": "TCW",
     "categories": [
       "Technology"
     ],
+    "systemUrl": "https://tcw.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1084,9 +1106,11 @@
     "description": "Find job vacancies and apply for advertised opportunities.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "RAP",
     "categories": [
       "Career and development"
     ],
+    "systemUrl": "https://rap.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1098,9 +1122,11 @@
     "description": "Register interest and apply for upcoming training sessions.",
     "owner": "Education and Training",
     "updated": "2026-09-28",
+    "shortName": "TR",
     "categories": [
       "Career and development"
     ],
+    "systemUrl": "https://tr.nt.gov.au/",
     "demoFields": [
       "updated"
     ]
@@ -1726,6 +1752,35 @@
     "updated": "2026-09-16",
     "categories": [
       "Health and safety"
+    ],
+    "demoFields": [
+      "updated"
+    ]
+  },
+  {
+    "id": "multifactor-authentication",
+    "label": "Multi-factor authentication (MFA)",
+    "type": "Information",
+    "description": "Multi-factor authentication adds a second verification step at sign-in to help protect an account. Follow your organisation's approved instructions for setup.",
+    "owner": "Corporate and Digital Development",
+    "updated": "2026-11-03",
+    "categories": [
+      "Technology",
+      "Services and applications"
+    ],
+    "keywords": "MFA 2FA 2SV multi-factor multifactor two-factor two-step verification sign-in account security",
+    "aliases": [
+      "MFA",
+      "2FA",
+      "2SV",
+      "multi-factor authentication",
+      "multi factor authentication",
+      "multifactor authentication",
+      "two-factor authentication",
+      "two factor authentication",
+      "two-step authentication",
+      "two-step verification",
+      "2-step verification"
     ],
     "demoFields": [
       "updated"
@@ -3440,6 +3495,7 @@
     "description": "A centralised tool for managers and executives to have oversight of their workforce.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-14",
+    "shortName": "WD",
     "categories": [
       "Employment types",
       "Technology",
@@ -3450,6 +3506,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/workforce-dashboards",
+    "systemUrl": "https://wd.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3462,6 +3519,7 @@
     "description": "Web Emergency Operations Centre (WebEOC) is a web-based crisis management system.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "W",
     "categories": [
       "Health and safety",
       "Technology"
@@ -3471,6 +3529,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/webeoc",
+    "systemUrl": "https://w.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3483,6 +3542,7 @@
     "description": "This portal provides access to data and information collected and generated by the Water Resources Division.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "WDP",
     "categories": [
       "Technology"
     ],
@@ -3491,6 +3551,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/water-data-portal",
+    "systemUrl": "https://wdp.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3503,6 +3564,7 @@
     "description": "Purchasing system that connects buyers to suppliers under approved panel contracts.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "VendorPanel",
     "categories": [
       "Career and development",
       "Finance and procurement",
@@ -3514,6 +3576,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/vendorpanel",
+    "systemUrl": "https://vendorpanel.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3543,6 +3606,7 @@
     "description": "Book a government vehicle",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "VBS",
     "categories": [
       "Employment types",
       "Finance and procurement",
@@ -3553,6 +3617,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/vehicle-booking-system",
+    "systemUrl": "https://vbs.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3565,6 +3630,7 @@
     "description": "Access and manage NTG documents and records using the TRM (Content Manager) records system.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TRM",
     "categories": [
       "Career and development",
       "Technology"
@@ -3574,6 +3640,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trm",
+    "systemUrl": "https://trm.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3586,6 +3653,7 @@
     "description": "Get approval to travel and submit your travel itinerary.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-15",
+    "shortName": "TRIPS",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -3596,6 +3664,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trips",
+    "systemUrl": "https://trips.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3608,6 +3677,7 @@
     "description": "Monitor the establishment, management and closing out of NTG awarded contracts.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "T",
     "categories": [
       "Finance and procurement",
       "Technology"
@@ -3618,6 +3688,7 @@
       "Trax - Contract Management System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trax",
+    "systemUrl": "https://t.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3630,6 +3701,7 @@
     "description": "Generate, maintain and share contract, procurement and novation templates.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TDO",
     "categories": [
       "Career and development",
       "Finance and procurement"
@@ -3639,6 +3711,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/template-documents-online",
+    "systemUrl": "https://tdo.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3668,6 +3741,7 @@
     "description": "A drawing database for NTG buildings, roads and civil assets.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TRMS",
     "categories": [
       "Employment types",
       "Technology"
@@ -3678,6 +3752,7 @@
       "TRMS - Technical Records Management System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/technical-records",
+    "systemUrl": "https://trms.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3690,6 +3765,7 @@
     "description": "SubscribeMe is a centralised email subscription service.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "SubscribeMe",
     "categories": [
       "Technology",
       "Services and applications"
@@ -3699,6 +3775,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/subscribeme",
+    "systemUrl": "https://subscribeme.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3727,6 +3804,7 @@
     "description": "Access data on geoscience, mineral and petroleum resources in the NT.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "STRIKE",
     "categories": [
       "Technology"
     ],
@@ -3735,6 +3813,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/strike-spatial-territory-resource-information-kit-for-exploration",
+    "systemUrl": "https://strike.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3747,6 +3826,7 @@
     "description": "Access HR information such as staff movements, employment actions, leave and payments.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-15",
+    "shortName": "SAP BI HR",
     "categories": [
       "Employment types",
       "Services and applications"
@@ -3756,6 +3836,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/sap-bi-hr",
+    "systemUrl": "https://sap-bi-hr.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3768,6 +3849,7 @@
     "description": "Access finance reports through financial statements, summary views and raw data.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-14",
+    "shortName": "SBF",
     "categories": [
       "Employment types",
       "Finance and procurement",
@@ -3779,6 +3861,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/sap-bi-finance",
+    "systemUrl": "https://sbf.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3791,6 +3874,7 @@
     "description": "Sage is a single standardised ICT system for all NTG agencies to manage their budget requirements consistently and efficiently.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-14",
+    "shortName": "S",
     "categories": [
       "Change management",
       "Finance and procurement",
@@ -3801,6 +3885,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/sage",
+    "systemUrl": "https://s.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3830,6 +3915,7 @@
     "description": "Secure CPROD network storage location to sensitive Royal Commission legal evidence.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "RCD",
     "categories": [
       "Technology",
       "Services and applications"
@@ -3839,6 +3925,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/royal-commission",
+    "systemUrl": "https://rcd.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3851,6 +3938,7 @@
     "description": "For NT health workers to report and manage workplace incidents and near misses.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "RIRMS",
     "categories": [
       "Health and safety",
       "Technology"
@@ -3860,6 +3948,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/riskman",
+    "systemUrl": "https://rirms.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3872,6 +3961,7 @@
     "description": "Access information on NT roads and selected transport assets.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "RIMS",
     "categories": [
       "Technology"
     ],
@@ -3880,6 +3970,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/rims",
+    "systemUrl": "https://rims.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3892,6 +3983,7 @@
     "description": "Access procurement opportunities.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "QTOL",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -3902,6 +3994,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/qtol",
+    "systemUrl": "https://qtol.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3914,6 +4007,7 @@
     "description": "Provides DCF staff with access to a departmental training calendar, induction timetables and outlines of induction programs as well as resources and learner guides to support the ongoing learning a...",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "PRLTC",
     "categories": [
       "Career and development",
       "Employment types",
@@ -3925,6 +4019,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/professional-reference-library-and-training-calendar",
+    "systemUrl": "https://prltc.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3937,6 +4032,7 @@
     "description": "NTG's payroll processing data management system.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "PIPS",
     "categories": [
       "Employment types",
       "Technology"
@@ -3946,6 +4042,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/pips",
+    "systemUrl": "https://pips.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -3994,6 +4091,7 @@
     "description": "Management of pensioner concession account details and authorised payments and concessions",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "PCS",
     "categories": [
       "Technology",
       "Services and applications"
@@ -4003,6 +4101,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/pensioner-concession-system",
+    "systemUrl": "https://pcs.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4015,6 +4114,7 @@
     "description": "Access the ICT service catalogue.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "N",
     "categories": [
       "Technology",
       "Services and applications"
@@ -4024,6 +4124,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ntgservices",
+    "systemUrl": "https://n.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4052,6 +4153,7 @@
     "description": "NTGPASS members can view their annual member information statements online.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "NTGPASS",
     "categories": [
       "General information"
     ],
@@ -4060,6 +4162,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ntgpass",
+    "systemUrl": "https://ntgpass.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4072,6 +4175,7 @@
     "description": "Submit, track and manage requests. You can contact most DCDD shared services teams through the Portal Hub.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "NTG Portal Hub",
     "categories": [
       "Technology",
       "Services and applications"
@@ -4081,6 +4185,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ntg-portal-hub",
+    "systemUrl": "https://ntg-portal-hub.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4093,6 +4198,7 @@
     "description": "NTG Pay is the NTG purchase-to-pay solution.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "NTG Pay",
     "categories": [
       "Finance and procurement",
       "Technology"
@@ -4102,6 +4208,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ntg-pay-purchase-to-pay",
+    "systemUrl": "https://ntg-pay.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4146,6 +4253,7 @@
     "description": "Access data on natural resources in the NT.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "NR Maps",
     "categories": [
       "Technology"
     ],
@@ -4154,6 +4262,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/natural-resource-maps",
+    "systemUrl": "https://nr-maps.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4182,6 +4291,7 @@
     "description": "Provides a contemporary interactive chart of the NTG organisational structure.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "myOrgchart",
     "categories": [
       "Employment types",
       "Flexible work",
@@ -4193,6 +4303,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/myorgchart",
+    "systemUrl": "https://myorgchart.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4205,6 +4316,7 @@
     "description": "Access online training courses.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "M",
     "categories": [
       "Career and development",
       "Employment types"
@@ -4214,6 +4326,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/mylearning",
+    "systemUrl": "https://m.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4226,6 +4339,7 @@
     "description": "View payslips, manage leave and keep your information updated.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "M",
     "categories": [
       "Employment types",
       "Technology",
@@ -4236,6 +4350,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/myhr",
+    "systemUrl": "https://m.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4248,6 +4363,7 @@
     "description": "A tool to track and manage your online forms.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "M",
     "categories": [
       "Employment types",
       "Flexible work",
@@ -4258,6 +4374,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/myforms",
+    "systemUrl": "https://m.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4270,6 +4387,7 @@
     "description": "View a summary of fleet vehicle details.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "MFR",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -4281,6 +4399,7 @@
       "myFleet Requests"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/my-fleet-requests",
+    "systemUrl": "https://mfr.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4293,6 +4412,7 @@
     "description": "Interactive reporting about digital business systems.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "MSI",
     "categories": [
       "Technology"
     ],
@@ -4301,6 +4421,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/msi",
+    "systemUrl": "https://msi.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4313,6 +4434,7 @@
     "description": "Used to manage driver licence renewals and vehicle registrations in the Northern Territory.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "MOVERS",
     "categories": [
       "Finance and procurement"
     ],
@@ -4321,6 +4443,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/movers",
+    "systemUrl": "https://movers.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4333,6 +4456,7 @@
     "description": "MAX is an online system used for various biosecurity and emergency management tasks and incorporates Trapbase for trap monitoring.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "MAX",
     "categories": [
       "Employment types",
       "Health and safety",
@@ -4344,6 +4468,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/max",
+    "systemUrl": "https://max.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4356,6 +4481,7 @@
     "description": "JIRA is an online tool that can manage many types of projects, including IT support, operations, HR, and marketing.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "JCSM",
     "categories": [
       "Services and applications"
     ],
@@ -4364,6 +4490,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/jira-and-confluence",
+    "systemUrl": "https://jcsm.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4376,6 +4503,7 @@
     "description": "Case management system.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "IOMS",
     "categories": [
       "Technology"
     ],
@@ -4384,6 +4512,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ioms",
+    "systemUrl": "https://ioms.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4396,6 +4525,7 @@
     "description": "NTG Suppliers can lodge invoices, access templates and track payments.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "I",
     "categories": [
       "Technology"
     ],
@@ -4404,6 +4534,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/invoicentg",
+    "systemUrl": "https://i.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4416,6 +4547,7 @@
     "description": "Access data about land and property in the NT.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "ILIS",
     "categories": [
       "Technology"
     ],
@@ -4424,6 +4556,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ilis",
+    "systemUrl": "https://ilis.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4436,6 +4569,7 @@
     "description": "Mainframe system used by AGD, PFES, TFHC, DCDD and DIPL to record and manage justice information.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "IJIS",
     "categories": [
       "Technology",
       "Services and applications"
@@ -4445,6 +4579,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ijis",
+    "systemUrl": "https://ijis.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4457,6 +4592,7 @@
     "description": "Submit grant applicants and manage grant funding.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "G",
     "categories": [
       "Services and applications"
     ],
@@ -4465,6 +4601,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/grantsnt",
+    "systemUrl": "https://g.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4477,6 +4614,7 @@
     "description": "Government financial management system.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "GAS",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -4487,6 +4625,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/gas",
+    "systemUrl": "https://gas.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4499,6 +4638,7 @@
     "description": "Submit applications to travel to and from remote locations.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "FMS",
     "categories": [
       "Employment types",
       "Finance and procurement",
@@ -4509,6 +4649,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/foils-management-system",
+    "systemUrl": "https://fms.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4521,6 +4662,7 @@
     "description": "Manage all leased vehicles including purchasing, replacing or servicing a vehicle.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "FBS Online",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -4531,6 +4673,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/fleet-business-system-online",
+    "systemUrl": "https://fbs-online.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4543,6 +4686,7 @@
     "description": "Report workplace safety incidents, near misses and hazards.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "Figtree",
     "categories": [
       "Employment types",
       "Health and safety",
@@ -4553,6 +4697,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/figtree",
+    "systemUrl": "https://figtree.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4565,6 +4710,7 @@
     "description": "Manage and process credit card transactions. Expense8 replaced ECMS.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "Expense8",
     "categories": [
       "Technology"
     ],
@@ -4573,6 +4719,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/expense8",
+    "systemUrl": "https://expense8.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4585,6 +4732,7 @@
     "description": "Access online recruitment templates and job applications.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "eRecruit",
     "categories": [
       "Employment types",
       "Services and applications"
@@ -4594,6 +4742,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/erecruit",
+    "systemUrl": "https://erecruit.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4606,6 +4755,7 @@
     "description": "Archive of government invoices.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "EIMS archive",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -4616,6 +4766,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/eims",
+    "systemUrl": "https://eims-archive.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4678,6 +4829,7 @@
     "description": "Provides data and authentication services for business applications.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "CD",
     "categories": [
       "Technology",
       "Services and applications"
@@ -4687,6 +4839,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/corporate-directory",
+    "systemUrl": "https://cd.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4699,6 +4852,7 @@
     "description": "Access and export mainframe application reports.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "CDOR",
     "categories": [
       "Technology",
       "Services and applications"
@@ -4708,6 +4862,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/control-d-online-report",
+    "systemUrl": "https://cdor.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4756,6 +4911,7 @@
     "description": "Primary information system used to manage client services provided by the agency in urban community based facilities and settings.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "CCIS",
     "categories": [
       "Employment types",
       "Health and safety",
@@ -4767,6 +4923,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/community-care-information-system",
+    "systemUrl": "https://ccis.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4779,6 +4936,7 @@
     "description": "CARE provides an integrated case management solution supporting child protection, youth justice and adoption activities",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-16",
+    "shortName": "CARE",
     "categories": [
       "Technology"
     ],
@@ -4787,6 +4945,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/care",
+    "systemUrl": "https://care.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4799,6 +4958,7 @@
     "description": "The Business Customer Relationship Management is a core business system that centralises client management information.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "CRM",
     "categories": [
       "Technology"
     ],
@@ -4807,6 +4967,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/business-crm",
+    "systemUrl": "https://crm.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4819,6 +4980,7 @@
     "description": "Access information about the remote communities in the Northern Territory.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "B",
     "categories": [
       "General information"
     ],
@@ -4827,6 +4989,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/bushtel",
+    "systemUrl": "https://b.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4873,6 +5036,7 @@
     "description": "Use to identify and record an inventory of NTG building assets.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "AV",
     "categories": [
       "General information"
     ],
@@ -4881,6 +5045,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/asset-view",
+    "systemUrl": "https://av.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -4924,6 +5089,7 @@
     "description": "Issue work requests and process payments for contractors working on NTG projects.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "AP",
     "categories": [
       "Technology",
       "Services and applications"
@@ -4933,6 +5099,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/asnex-portal",
+    "systemUrl": "https://ap.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -5022,10 +5189,10 @@
       "NTG directory"
     ],
     "url": "https://ntgcentral.nt.gov.au/phones/details",
+    "email": "contact-demo@example.org",
     "demoFields": [
       "email"
-    ],
-    "email": "contact-demo@example.org"
+    ]
   },
   {
     "id": "fb-b5ce50c044a7ed88",
@@ -5034,6 +5201,7 @@
     "description": "Create, process and record procurement actions.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "APRO",
     "categories": [
       "Finance and procurement"
     ],
@@ -5042,6 +5210,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/apro",
+    "systemUrl": "https://apro.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -5054,6 +5223,7 @@
     "description": "Budgeting, consolidation and financial reporting system.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "ABRS",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -5064,6 +5234,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/apex",
+    "systemUrl": "https://abrs.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -5076,6 +5247,7 @@
     "description": "Manage NTG Assets.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "AIS",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -5086,6 +5258,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ais",
+    "systemUrl": "https://ais.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -5098,6 +5271,7 @@
     "description": "ABS-JGG Central provides “on the job” support for users when accessing and recording data in agency specific applications.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "ABS-JGG Central",
     "categories": [
       "Technology",
       "Services and applications"
@@ -5107,6 +5281,7 @@
       "Online systems"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/agency-business-systems-justice-and-general-government",
+    "systemUrl": "https://abs-jgg-central.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -7304,7 +7479,7 @@
     "id": "fb-5558ae2f090c0bd4",
     "label": "ICT induction",
     "type": "Information",
-    "description": "A range of ICT services information to assist new and existing employees with their ICT needs.",
+    "description": "A range of ICT services information to assist new and existing employees with their ICT needs. Multi-factor authentication adds a second verification step at sign-in to help protect an account. Follow your organisation's approved instructions for setup.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
     "categories": [
@@ -7433,6 +7608,7 @@
     "description": "Read about upgrades, system issues, user instructions and impact statements.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TURH",
     "categories": [
       "Technology",
       "Services and applications"
@@ -7443,6 +7619,7 @@
       "TRM (Content Manager)"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trm/trm-upgrades-release-history",
+    "systemUrl": "https://turh.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -7637,6 +7814,7 @@
     "description": "Access TRM training videos.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TLR",
     "categories": [
       "Career and development"
     ],
@@ -7646,6 +7824,7 @@
       "TRM (Content Manager)"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trm/resources",
+    "systemUrl": "https://tlr.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -7658,6 +7837,7 @@
     "description": "TRIPS guideline on how to edit or cancel a movement requisition.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TEOCMR",
     "categories": [
       "General information"
     ],
@@ -7667,6 +7847,7 @@
       "TRIPS - Travel Request Information Processing System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trips/trips-wediting-or-cancelling-a-movement-requisition",
+    "systemUrl": "https://teocmr.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -7679,6 +7860,7 @@
     "description": "TRIPS guideline on how to complete the travel itinerary screen",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TCTIS",
     "categories": [
       "Finance and procurement"
     ],
@@ -7688,6 +7870,7 @@
       "TRIPS - Travel Request Information Processing System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trips/trips-completing-the-travel-itinerary-screen",
+    "systemUrl": "https://tctis.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -7735,6 +7918,7 @@
     "description": "TRIPS guideline on how to use the comments section, workflow and audit logs",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TRIPS comments section, workflow and audit logs",
     "categories": [
       "Services and applications"
     ],
@@ -7744,6 +7928,7 @@
       "TRIPS - Travel Request Information Processing System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trips/trips-comments-section,-workflow-and-audit-logs-how-to-use",
+    "systemUrl": "https://trips-comments-section-workflow-and-audit-logs.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -7756,6 +7941,7 @@
     "description": "Contact your agency administrator for TRIPS support.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "TAA",
     "categories": [
       "Services and applications"
     ],
@@ -7765,6 +7951,7 @@
       "TRIPS - Travel Request Information Processing System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trips/trips-agency-administrators",
+    "systemUrl": "https://taa.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -7940,6 +8127,7 @@
     "description": "Contact list of Trax agency delegates.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-16",
+    "shortName": "TAD",
     "categories": [
       "Services and applications"
     ],
@@ -7949,6 +8137,7 @@
       "Trax - Contract Management System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/trax/trax-agency-delegates",
+    "systemUrl": "https://tad.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -8554,6 +8743,7 @@
     "description": "A contact list of Northern Territory Government agencies' NTG Pay administrators.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "NPAA",
     "categories": [
       "Finance and procurement",
       "Services and applications"
@@ -8564,6 +8754,7 @@
       "NTG Pay – Purchase to pay"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/ntg-pay-purchase-to-pay/ntg-pay-agency-administrators",
+    "systemUrl": "https://npaa.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -8594,6 +8785,7 @@
     "description": "Discover, research and map natural and cultural research data.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "Natural Resource Maps",
     "categories": [
       "Technology"
     ],
@@ -8603,6 +8795,7 @@
       "NR Maps - Natural Resource Maps"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/natural-resource-maps/natural-resource-maps-secure-site-for-ntg-users",
+    "systemUrl": "https://natural-resource-maps.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -9601,6 +9794,7 @@
     "description": "Contact your agency administrator for GrantsNT support.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "GAA",
     "categories": [
       "Services and applications"
     ],
@@ -9610,6 +9804,7 @@
       "GrantsNT"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/grantsnt/grantsnt-agency-administrators",
+    "systemUrl": "https://gaa.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -9766,6 +9961,7 @@
     "description": "Contact the right department for a specific issue with using FOILS or find an agency administrator.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "FMSAA",
     "categories": [
       "Technology",
       "Services and applications"
@@ -9776,6 +9972,7 @@
       "FOILS Management System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/foils-management-system/foils-contacts-agency-administrators",
+    "systemUrl": "https://fmsaa.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -10079,6 +10276,7 @@
     "description": "Instructions on how to access the NTGs workplace safety incident and hazard reporting tool.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "HTAF",
     "categories": [
       "Health and safety",
       "Technology"
@@ -10089,6 +10287,7 @@
       "Figtree - Work Health and Safety System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/figtree/how-to-access-figtree",
+    "systemUrl": "https://htaf.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -10101,6 +10300,7 @@
     "description": "List of common icons used in Figtree.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "FQRTD",
     "categories": [
       "Health and safety"
     ],
@@ -10110,6 +10310,7 @@
       "Figtree - Work Health and Safety System"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/figtree/figtree-quick-reference-terms-and-definitions",
+    "systemUrl": "https://fqrtd.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -10233,6 +10434,7 @@
     "description": "Expense8 list of prohibited use cost centres",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "EPUCC",
     "categories": [
       "General information"
     ],
@@ -10242,6 +10444,7 @@
       "Expense8 - Credit card expense management system"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/expense8/expense8-prohibited-use-cost-centres",
+    "systemUrl": "https://epucc.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -10254,6 +10457,7 @@
     "description": "Contact your agency administrator for Expense8 support.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "EAA",
     "categories": [
       "Services and applications"
     ],
@@ -10263,6 +10467,7 @@
       "Expense8 - Credit card expense management system"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/expense8/expense8-agency-administrators",
+    "systemUrl": "https://eaa.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -10436,7 +10641,7 @@
     "id": "fb-da4d4a4e8eeb948f",
     "label": "Be alert for fake Canvas emails",
     "type": "News",
-    "description": "Stay alert and report suspicious contact linked to Canvas, the online education platform. Learn more about what you should do.",
+    "description": "Stay alert and report suspicious contact linked to Canvas, the online education platform. Learn more about what you should do. Multi-factor authentication adds a second verification step at sign-in to help protect an account. Follow your organisation's approved instructions for setup.",
     "owner": "Chief Minister and Cabinet",
     "updated": "2026-10-07",
     "categories": [
@@ -10542,6 +10747,7 @@
     "description": "These guidelines will assist you with using eRecruit to create and finalise an advertised RTF or to create a not-advertised RTF.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "EUG",
     "categories": [
       "General information"
     ],
@@ -10551,6 +10757,7 @@
       "eRecruit - Electronic Recruitment"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/erecruit/erecruit-guidelines",
+    "systemUrl": "https://eug.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -11251,6 +11458,7 @@
     "description": "The ASNEX web applications consists of a number of integrated module.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "AWA",
     "categories": [
       "Technology"
     ],
@@ -11260,6 +11468,7 @@
       "ASNEX Portal"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/asnex-portal/asnex-web-applications",
+    "systemUrl": "https://awa.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -11467,6 +11676,7 @@
     "description": "Find out more about the ASNEX solution.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "AS",
     "categories": [
       "Finance and procurement",
       "Technology",
@@ -11478,6 +11688,7 @@
       "ASNEX Portal"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/asnex-portal/asnex-solution",
+    "systemUrl": "https://as.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -11490,6 +11701,7 @@
     "description": "View the ASNEX systems service architecture.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "AC",
     "categories": [
       "Technology",
       "Services and applications"
@@ -11500,6 +11712,7 @@
       "ASNEX Portal"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/asnex-portal/asnex-concept",
+    "systemUrl": "https://ac.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -11512,6 +11725,7 @@
     "description": "Purpose of the APRO archive and getting help using it.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
+    "shortName": "APROA",
     "categories": [
       "Finance and procurement",
       "Technology"
@@ -11522,6 +11736,7 @@
       "APRO - Agencies Purchase Requisitions Online"
     ],
     "url": "https://ntgcentral.nt.gov.au/online-systems/apro/agencies-purchase-requisitions-online-archive",
+    "systemUrl": "https://aproa.nt.gov.au/",
     "demoFields": [
       "email"
     ],
@@ -13660,7 +13875,7 @@
     "id": "fb-fe112b756841d368",
     "label": "Microsoft Office 365",
     "type": "Information",
-    "description": "Applications you can access as part of the Office 365 suite.",
+    "description": "Applications you can access as part of the Office 365 suite. Multi-factor authentication adds a second verification step at sign-in to help protect an account. Follow your organisation's approved instructions for setup.",
     "owner": "Corporate and Digital Development",
     "updated": "2026-10-07",
     "categories": [

@@ -40,6 +40,7 @@ const allowedFields = new Set([
   "categories",
   "owner",
   "updated",
+  "shortName",
   "keywords",
   "aliases",
   "breadcrumbs",
@@ -49,9 +50,12 @@ const allowedFields = new Set([
   "email",
   "phone",
   "extension",
+  "businessUnit",
+  "department",
   "source",
   "inferredFields",
   "demoFields",
+  "systemUrl",
 ]);
 
 export function publicText(value) {
@@ -112,6 +116,7 @@ export function sanitizeRecords(records) {
       "description",
       "owner",
       "updated",
+      "shortName",
     ]) {
       if (record[field] !== undefined) clean[field] = publicText(record[field]);
     }
@@ -128,6 +133,8 @@ export function sanitizeRecords(records) {
     }
     const url = publicUrl(record.url);
     if (url) clean.url = url;
+    const systemUrl = publicUrl(record.systemUrl);
+    if (systemUrl) clean.systemUrl = systemUrl;
     if (record.demoFields)
       clean.demoFields = record.demoFields.filter(
         (field) => field === "updated",

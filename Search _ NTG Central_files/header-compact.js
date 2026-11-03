@@ -10,27 +10,11 @@
       return;
     }
 
-    var utilityLinkPatterns = [
-      "phones.nt.gov.au",
-      "ntgcentral.nt.gov.au/policy-library",
-      "ntgcentral.nt.gov.au/ntgov-noticeboard/all-items",
-      "myhr.nt.gov.au",
-      "myforms.nt.gov.au",
-      "ntgcentral.nt.gov.au/online-systems",
-      "internal.nt.gov.au/dcdd/",
-    ];
-
-    mainMenu.querySelectorAll("ul.level-one > li").forEach(function (item) {
-      var link = item.querySelector(":scope > a");
-      var href = link ? link.getAttribute("href") || "" : "";
-      var isUtilityLink = utilityLinkPatterns.some(function (pattern) {
-        return href.indexOf(pattern) !== -1;
-      });
-
-      if (item.classList.contains("ml-auto") || isUtilityLink) {
+    mainMenu
+      .querySelectorAll("ul.level-one > li[data-utility-link], ul.level-one > li.ml-auto")
+      .forEach(function (item) {
         item.remove();
-      }
-    });
+      });
 
     mainMenu.querySelectorAll(".menu-wrapper").forEach(function (wrapper) {
       var list = wrapper.querySelector("ul.level-two");
