@@ -191,7 +191,10 @@ function within(record, state, except) {
 
 export function searchIndex(records, state) {
   const strictMatches = rankRecords(records, state.query);
-  const strictFiltered = strictMatches.filter(({ record }) => within(record, state));
+  // Ignore the type filter so tab counts don't change with the selected tab.
+  const strictFiltered = strictMatches.filter(({ record }) =>
+    within(record, state, "type"),
+  );
   const fallbackMatches =
     strictFiltered.length < pageSize
       ? rankRecords(records, state.query, true)
