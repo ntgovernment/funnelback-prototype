@@ -74,13 +74,16 @@ if (form && input && list && status) {
       : 'No search suggestions.';
   }
 
-  function selectSuggestion(index) {
+  function selectSuggestion(index, submit = false) {
     if (!matches[index]) {
       return;
     }
     input.value = matches[index].label;
     closeSuggestions();
     input.focus();
+    if (submit) {
+      form.requestSubmit();
+    }
   }
 
   input.addEventListener('input', updateSuggestions);
@@ -132,7 +135,7 @@ if (form && input && list && status) {
   list.addEventListener('click', (event) => {
     const option = event.target.closest('[role="option"]');
     if (option && list.contains(option)) {
-      selectSuggestion(Array.from(list.children).indexOf(option));
+      selectSuggestion(Array.from(list.children).indexOf(option), true);
     }
   });
   form.addEventListener('focusout', (event) => {

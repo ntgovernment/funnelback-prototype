@@ -3,6 +3,7 @@ import {
   normalize,
   initialQuery,
   safeUrl,
+  searchIndex,
   searchIndexWithCorrection,
   suggestRelatedTerms,
   types,
@@ -300,10 +301,7 @@ function renderRecord(record) {
     article.append(contact);
   } else {
     const crumbs = element("div", "local-breadcrumbs");
-    const path = [
-      "NTG Central",
-      ...(record.breadcrumbs || [record.type, record.categories[0]]),
-    ];
+    const path = record.breadcrumbs || [record.type, record.categories[0]];
     path.forEach((part, index) => {
       if (index) crumbs.append(icon("fa-chevron-right"));
       crumbs.append(element("span", "", part));
@@ -316,20 +314,22 @@ function renderRecord(record) {
       record.type === "Enterprise service"
     ) {
       const actions = element("div", "local-actions");
+      const onlineSystem = record.type === "Online system";
       actions.append(
         destination(
-          `${record.url ? "Open" : "View"} ${record.label}`,
-          record.url,
+          onlineSystem
+            ? `Open ${record.shortName || record.label}`
+            : `${record.url ? "Open" : "View"} ${record.label}`,
+          onlineSystem ? record.systemUrl : record.url,
           record.id,
           "",
           false,
         ),
       );
-      const onlineSystem = record.type === "Online system";
       const email = record.email || "service-demo@example.org";
       const demoEmail = !record.email || record.demoFields?.includes("email");
       const supportLabel = onlineSystem
-        ? "Support contact"
+        ? "Contact support"
         : demoEmail
           ? "Demo support contact"
           : "Contact support";
@@ -350,17 +350,16 @@ function renderRecord(record) {
       article.append(actions);
     }
   }
-  const demoOnlineSystemDate =
-    record.type === "Online system" && record.demoFields?.includes("updated");
-  if (record.type !== "Contact" && record.updated && !demoOnlineSystemDate) {
+  if (
+    record.type !== "Contact" &&
+    record.type !== "Online system" &&
+    record.updated
+  ) {
     const date = new Date(`${record.updated}T12:00:00Z`).toLocaleDateString(
       "en-AU",
       { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" },
     );
-    const label = record.demoFields?.includes("updated")
-      ? "Demo date"
-      : "Last updated";
-    article.append(element("p", "local-updated", `${label}: ${date}`));
+    article.append(element("p", "local-updated", `Last updated: ${date}`));
   }
   return article;
 }

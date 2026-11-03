@@ -75,6 +75,11 @@ export function validateIndex(data) {
       (record.updated &&
         new Date(record.updated).toISOString().slice(0, 10) !==
           record.updated) ||
+      (record.shortName !== undefined &&
+        (typeof record.shortName !== "string" || !record.shortName.trim())) ||
+      (record.systemUrl !== undefined &&
+        (!safeUrl(record.systemUrl) ||
+          !safeUrl(record.systemUrl).startsWith("https:"))) ||
       (record.aliases &&
         (!Array.isArray(record.aliases) ||
           record.aliases.some(
